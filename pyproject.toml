@@ -9,19 +9,8 @@ description = "Community-developed scientific toolkit for astroparticle, high-en
 readme = "README.md"
 requires-python = ">=3.10"
 license = {file = "LICENSE"}
-authors = [
-    {name = "Project MAHAM"}
-]
-keywords = [
-    "astroparticle physics",
-    "high-energy astrophysics",
-    "astronomy",
-    "multimessenger",
-    "neutrinos",
-    "cosmic rays",
-    "gamma rays"
-]
-
+authors = [{name = "Project MAHAM"}]
+keywords = ["astroparticle physics", "high-energy astrophysics", "astronomy", "multimessenger", "neutrinos", "cosmic rays", "gamma rays"]
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
     "Intended Audience :: Science/Research",
@@ -30,27 +19,12 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Astronomy",
     "Topic :: Scientific/Engineering :: Physics"
 ]
-
-dependencies = [
-    "numpy>=1.24",
-    "scipy>=1.10",
-    "astropy>=5.3"
-]
+dependencies = ["numpy>=1.24", "scipy>=1.10", "astropy>=5.3"]
 
 [project.optional-dependencies]
-plotting = [
-    "matplotlib>=3.7"
-]
-
-data = [
-    "pandas>=2.0"
-]
-
-dev = [
-    "pytest>=8",
-    "pytest-cov",
-    "ruff"
-]
+plotting = ["matplotlib>=3.7"]
+data = ["pandas>=2.0"]
+dev = ["pytest>=8", "pytest-cov", "ruff"]
 
 [project.urls]
 Homepage = "https://github.com/Project-MAHAM"
@@ -64,4 +38,4 @@ where = ["src"]
 testpaths = ["tests"]
 
 [tool.ruff]
-line-length = 100
+line-length = 120

@@ -117,68 +117,57 @@ maham/
 │
 ├── src/
 │   └── maham/
-│       │
 │       ├── __init__.py
 │       ├── citations.py
-│       │
 │       ├── _core/
 │       │   ├── __init__.py
 │       │   ├── metadata.py
 │       │   ├── units.py
 │       │   └── typing.py
-│       │
 │       ├── physics/
 │       │   ├── __init__.py
 │       │   ├── particles.py
 │       │   ├── kinematics.py
 │       │   ├── interactions.py
 │       │   └── propagation.py
-│       │
 │       ├── spectra/
 │       │   ├── __init__.py
 │       │   ├── conversions.py
 │       │   ├── integration.py
 │       │   └── weighting.py
-│       │
 │       ├── statistics/
 │       │   ├── __init__.py
 │       │   ├── counting.py
 │       │   ├── intervals.py
 │       │   ├── likelihood.py
 │       │   └── hypothesis.py
-│       │
 │       ├── detector/
 │       │   ├── __init__.py
 │       │   ├── response.py
 │       │   ├── exposure.py
 │       │   ├── rates.py
 │       │   └── sensitivity.py
-│       │
 │       ├── astronomy/
 │       │   ├── __init__.py
 │       │   ├── coordinates.py
 │       │   ├── time.py
 │       │   ├── visibility.py
 │       │   └── skymap.py
-│       │
 │       ├── multimessenger/
 │       │   ├── __init__.py
 │       │   ├── coincidence.py
 │       │   ├── association.py
 │       │   └── transients.py
-│       │
 │       ├── radio/
 │       │   ├── __init__.py
 │       │   ├── antenna.py
 │       │   ├── transmission.py
 │       │   ├── polarization.py
 │       │   └── noise.py
-│       │
 │       ├── models/
 │       │   ├── __init__.py
 │       │   ├── base.py
 │       │   ├── registry.py
-│       │   │
 │       │   ├── flux/
 │       │   │   ├── __init__.py
 │       │   │   ├── neutrino/
@@ -187,36 +176,30 @@ maham/
 │       │   │   │   └── __init__.py
 │       │   │   └── gamma_ray/
 │       │   │       └── __init__.py
-│       │   │
 │       │   ├── cross_sections/
 │       │   │   └── __init__.py
-│       │   │
 │       │   ├── sources/
 │       │   │   └── __init__.py
-│       │   │
 │       │   ├── attenuation/
 │       │   │   └── __init__.py
-│       │   │
 │       │   ├── backgrounds/
 │       │   │   └── __init__.py
-│       │   │
 │       │   └── populations/
 │       │       └── __init__.py
-│       │
 │       ├── datasets/
 │       │   ├── __init__.py
 │       │   ├── base.py
 │       │   ├── registry.py
-│       │   │
 │       │   ├── spectra/
 │       │   │   ├── __init__.py
+│       │   │   ├── base.py
 │       │   │   ├── neutrino/
-│       │   │   │   └── __init__.py
+│       │   │   │   ├── __init__.py
+│       │   │   │   └── icecube_glashow_2021.py
 │       │   │   ├── cosmic_ray/
 │       │   │   │   └── __init__.py
 │       │   │   └── gamma_ray/
 │       │   │       └── __init__.py
-│       │   │
 │       │   ├── limits/
 │       │   │   ├── __init__.py
 │       │   │   ├── neutrino/
@@ -225,7 +208,6 @@ maham/
 │       │   │   │   └── __init__.py
 │       │   │   └── gamma_ray/
 │       │   │       └── __init__.py
-│       │   │
 │       │   ├── sensitivities/
 │       │   │   ├── __init__.py
 │       │   │   ├── neutrino/
@@ -234,13 +216,10 @@ maham/
 │       │   │   │   └── __init__.py
 │       │   │   └── gamma_ray/
 │       │   │       └── __init__.py
-│       │   │
 │       │   └── events/
 │       │       └── __init__.py
-│       │
 │       ├── data/
 │       │   ├── __init__.py
-│       │   │
 │       │   ├── models/
 │       │   │   ├── README.md
 │       │   │   ├── flux/
@@ -252,7 +231,6 @@ maham/
 │       │   │   ├── attenuation/
 │       │   │   ├── backgrounds/
 │       │   │   └── populations/
-│       │   │
 │       │   └── datasets/
 │       │       ├── README.md
 │       │       ├── spectra/
@@ -268,13 +246,11 @@ maham/
 │       │       │   ├── cosmic_ray/
 │       │       │   └── gamma_ray/
 │       │       └── events/
-│       │
 │       ├── integrations/
 │       │   ├── __init__.py
 │       │   ├── nuradio.py
 │       │   ├── root.py
 │       │   └── healpy.py
-│       │
 │       └── plotting/
 │           ├── __init__.py
 │           ├── spectra.py
@@ -285,6 +261,7 @@ maham/
 ├── tests/
 │   ├── physics/
 │   ├── spectra/
+│   │   └── test_conversions.py
 │   ├── statistics/
 │   ├── detector/
 │   ├── astronomy/
@@ -292,6 +269,7 @@ maham/
 │   ├── radio/
 │   ├── models/
 │   ├── datasets/
+│   │   └── test_icecube_glashow.py
 │   ├── integrations/
 │   └── plotting/
 │
@@ -348,3 +326,17 @@ Numerical tables distributed with MAHAM are stored separately under
 The same conceptual hierarchy is used for code and data where practical so that
 the relationship between an implementation and its associated numerical data
 remains clear.
+
+## Scientific naming conventions
+
+MAHAM uses plain ASCII notation for scientific quantity names in code, documentation, metadata, and text labels where practical.
+
+Examples include:
+
+- `E2phi` for energy-squared weighted flux
+- `Ephi` for energy-weighted flux
+- `phi` for differential flux
+- `nu` for neutrino
+- `nubar` for antineutrino
+
+Unicode mathematical symbols are not required to identify scientific quantities in the MAHAM API.
