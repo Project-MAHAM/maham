@@ -302,6 +302,7 @@ maham/
 │       │   └── healpy.py
 │       └── plotting/
 │           ├── __init__.py
+│           ├── style.py
 │           ├── spectra.py
 │           ├── limits.py
 │           ├── detector.py
@@ -327,6 +328,11 @@ maham/
 ├── validation/
 │   ├── README.md
 │   └── published_results/
+│       └── icecube/
+│           ├── README.md
+│           ├── validate.py
+│           └── outputs/
+│               └── .gitignore
 │
 ├── examples/
 │   ├── physics/
