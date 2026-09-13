@@ -245,7 +245,8 @@ maham/
 │       │   ├── sensitivities/
 │       │   │   ├── __init__.py
 │       │   │   ├── neutrino/
-│       │   │   │   └── __init__.py
+│       │   │   │   ├── __init__.py
+│       │   │   │   └── icecube_ehe_2025.py
 │       │   │   ├── cosmic_ray/
 │       │   │   │   └── __init__.py
 │       │   │   └── gamma_ray/
