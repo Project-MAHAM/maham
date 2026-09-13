@@ -133,6 +133,7 @@ maham/
 │       ├── spectra/
 │       │   ├── __init__.py
 │       │   ├── conversions.py
+│       │   ├── flavor.py
 │       │   ├── integration.py
 │       │   └── weighting.py
 │       ├── statistics/
@@ -195,6 +196,7 @@ maham/
 │       │   │   ├── base.py
 │       │   │   ├── neutrino/
 │       │   │   │   ├── __init__.py
+│       │   │   │   ├── base.py
 │       │   │   │   └── icecube_glashow_2021.py
 │       │   │   ├── cosmic_ray/
 │       │   │   │   └── __init__.py
@@ -261,7 +263,8 @@ maham/
 ├── tests/
 │   ├── physics/
 │   ├── spectra/
-│   │   └── test_conversions.py
+│   │   ├── test_conversions.py
+│   │   └── test_flavor.py
 │   ├── statistics/
 │   ├── detector/
 │   ├── astronomy/
@@ -315,6 +318,7 @@ maham/
 ├── LICENSE
 └── .gitignore
 
+
 The tree above describes the intended organization of MAHAM. It defines where
 future functionality belongs but does not imply that every planned module is
 already implemented.
@@ -340,3 +344,15 @@ Examples include:
 - `nubar` for antineutrino
 
 Unicode mathematical symbols are not required to identify scientific quantities in the MAHAM API.
+
+## Neutrino flavor conventions
+
+MAHAM does not silently convert between per-flavor and all-flavor neutrino quantities.
+
+A conversion between `per_flavor` and `all_flavor` requires an explicit physical assumption. The currently supported assumption is `equal`, corresponding to equal fluxes in the three neutrino flavors at Earth.
+
+For example:
+
+`per_flavor -> all_flavor` uses a factor of 3 only when `flavor_assumption="equal"` is explicitly requested.
+
+The original flavor convention of every published dataset is retained in its metadata.

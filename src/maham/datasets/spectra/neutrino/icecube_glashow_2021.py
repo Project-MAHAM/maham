@@ -7,11 +7,11 @@ from astropy.table import QTable, Table
 
 from maham._core.metadata import DataSource, DatasetMetadata, ProvenanceType, Reference, StorageMode
 from maham.datasets.registry import register_dataset
-from maham.datasets.spectra.base import SpectrumDataset
+from maham.datasets.spectra.neutrino.base import NeutrinoSpectrumDataset
 
 
 @register_dataset
-class IceCubeGlashowFlux2021(SpectrumDataset):
+class IceCubeGlashowFlux2021(NeutrinoSpectrumDataset):
     metadata = DatasetMetadata(
         id="icecube.glashow.flux.2021",
         title="IceCube Glashow resonance piecewise astrophysical neutrino flux",
@@ -29,7 +29,7 @@ class IceCubeGlashowFlux2021(SpectrumDataset):
         paper=Reference(title="Detection of a particle shower at the Glashow resonance with IceCube", authors=("IceCube Collaboration",), year=2021, doi="10.1038/s41586-021-03256-1"),
         dataset_reference=Reference(title="IceCube data for the first Glashow resonance candidate", authors=("IceCube Collaboration",), year=2021, doi="10.21234/gr2021"),
         source=DataSource(provenance=ProvenanceType.OFFICIAL_RELEASE, storage=StorageMode.REMOTE, url="https://icecube.wisc.edu/data-releases/20210310_IceCube_data_for_the_first_Glashow_resonance_candidate.zip", sha256="64c31773fe21b1dc6268da69f2f5427a8d22663b44fc4514a368385c1e455c88"),
-        notes=("The official source gives energy in GeV.", "The official source gives per-flavor E2phi in units of 1e-8 GeV cm-2 s-1 sr-1.", "The standardized energy value is the geometric mean of the published bin edges."),
+        notes=("The official source gives energy in GeV.", "The official source gives per-flavor E2phi in units of 1e-8 GeV cm-2 s-1 sr-1.", "The standardized energy value is the geometric mean of the published bin edges.", "The official source defines bins with y=0.0 as upper limits."),
         tags=("IceCube", "Glashow resonance", "astrophysical neutrinos", "flux"),
     )
 
@@ -57,6 +57,7 @@ class IceCubeGlashowFlux2021(SpectrumDataset):
         table["E2phi"] = np.asarray(raw["y"], dtype=float) * 1e-8 * E2phi_unit
         table["E2phi_lower"] = np.asarray(raw["y_lower"], dtype=float) * 1e-8 * E2phi_unit
         table["E2phi_upper"] = np.asarray(raw["y_upper"], dtype=float) * 1e-8 * E2phi_unit
+        table["is_upper_limit"] = np.asarray(raw["y"], dtype=float) == 0.0
         table.meta["dataset_id"] = self.metadata.id
         table.meta["quantity"] = self.metadata.quantity
         table.meta["flavor_convention"] = self.metadata.flavor_convention
