@@ -35,6 +35,9 @@ class DataSource:
     url: str | None = None
     path: str | None = None
     sha256: str | None = None
+    archive_member: str | None = None
+    archive_member_sha256: str | None = None
+    archive_member_size: int | None = None
 
 
 @dataclass(frozen=True)

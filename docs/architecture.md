@@ -1,7 +1,6 @@
 # MAHAM Architecture
 
-MAHAM is organized around scientific concepts rather than experiments or
-individual messengers.
+MAHAM is organized around scientific concepts rather than experiments or individual messengers.
 
 The project separates scientific content into three principal categories:
 
@@ -17,9 +16,9 @@ Examples include:
 - exposure and event-rate calculations
 - astronomical coordinate calculations
 - coincidence and association methods
+- detector-response calculations
 
-Methods should not depend on a particular experiment or published physical
-model.
+Methods should not depend on a particular experiment or published physical model.
 
 ## Models
 
@@ -36,8 +35,7 @@ Examples include:
 
 Models may be analytical, numerical, or tabulated.
 
-Each model should preserve its scientific provenance, including its reference,
-parameters, assumptions, units, conventions, and validity range.
+Each model should preserve its scientific provenance, including its reference, parameters, assumptions, units, conventions, and validity range.
 
 ## Datasets
 
@@ -49,26 +47,60 @@ Examples include:
 - flux measurements
 - upper limits
 - experimental sensitivities
+- published effective areas and other detector-response products
 - selected event measurements
 
-Each dataset should preserve its source, reference, units, conventions,
-confidence level where applicable, and provenance.
+Each dataset should preserve its source, reference, units, conventions, confidence level where applicable, and provenance.
 
-Official machine-readable data should be preferred over digitized data whenever
-available.
+Official machine-readable data should be preferred over digitized data whenever available.
+
+Published detector-response products such as effective areas belong under `datasets/` because they are experiment-specific published results. General calculations involving detector response belong under `detector/`.
+
+A single official release may contain several scientifically distinct products. These should be exposed as separate MAHAM datasets when their scientific meanings differ. For example, an observed upper limit, expected sensitivity, and effective area may come from the same release while remaining separate MAHAM dataset objects.
+
+## Dataset interface conventions
+
+Dataset interfaces separate the source representation from the standardized MAHAM representation.
+
+`load_raw()` returns the published source data as close as practical to the authoritative representation.
+
+`load()` returns a standardized MAHAM representation with explicit units, metadata, conventions, and scientifically meaningful column names.
+
+Spectrum datasets may additionally provide standardized representations such as:
+
+- `load_phi()`
+- `load_ephi()`
+- `load_e2phi()`
+
+or equivalently:
+
+- `load(quantity="phi")`
+- `load(quantity="Ephi")`
+- `load(quantity="E2phi")`
+
+These representations are derived on demand rather than stored as duplicate copies of the same scientific result.
+
+Upper-limit datasets should explicitly identify upper-limit values, for example through an `is_upper_limit` column when appropriate.
 
 ## Scientific data files
 
-Small redistributable numerical tables required by MAHAM are stored under
-
-`src/maham/data/`
-
-and distributed with the package.
+Small redistributable numerical tables required by MAHAM are stored under `src/maham/data/` and distributed with the package.
 
 The Python interfaces to those files remain under `models/` or `datasets/`.
 
-Large datasets or data that should remain at their authoritative source may be
-retrieved externally and cached rather than stored in the MAHAM repository.
+Large datasets or data that should remain at their authoritative source may be retrieved externally and cached rather than stored in the MAHAM repository.
+
+MAHAM should not become a general-purpose scientific data warehouse. Remote authoritative releases should remain at their official source whenever practical.
+
+## Remote data integrity
+
+Remote scientific data should be verified whenever a stable integrity reference is available.
+
+For ordinary static files, MAHAM may verify the checksum of the downloaded file.
+
+For dynamically generated archives, such as archives assembled by external data repositories at request time, the archive checksum itself may not be stable. In those cases MAHAM should verify the checksum and, where useful, the byte size of the specific scientific file contained inside the archive.
+
+Integrity verification should protect the scientific source content without assuming that transport containers or archive metadata remain byte-for-byte identical indefinitely.
 
 ## Validation
 
@@ -82,8 +114,7 @@ Software testing and scientific validation have different purposes.
 
 > Does the implementation reproduce the expected physics or published result?
 
-Scientific validation may reproduce analytical results, tables, benchmark
-calculations, or published figures.
+Scientific validation may reproduce analytical results, tables, benchmark calculations, or published figures.
 
 ## Integrations
 
@@ -91,28 +122,28 @@ Integrations are adapters to external software and data formats.
 
 They should contain no new scientific physics.
 
-Examples may include interfaces to NuRadioMC/NuRadioReco, ROOT, and HEALPix
-software.
+Examples may include interfaces to NuRadioMC/NuRadioReco, ROOT, and HEALPix software.
 
 ## Core architectural rules
 
 1. Organize scientific functionality by concept, not by experiment.
 2. General calculations belong in scientific method modules.
 3. Specific theoretical or phenomenological prescriptions belong in `models/`.
-4. Published measurements, limits, and sensitivities belong in `datasets/`.
+4. Published measurements, limits, sensitivities, effective areas, and other published detector-response products belong in `datasets/`.
 5. Experiment-specific adapters belong in `integrations/`, not in the scientific core.
-6. Do not duplicate functionality already provided well by established scientific packages without a clear scientific reason.
-7. Avoid generic dumping-ground modules such as `utils.py`, `helpers.py`, and `misc.py`.
-8. Tests verify software behavior; validation verifies scientific correctness.
-9. Data provenance, units, conventions, and citations are part of the scientific result and must not be hidden in plotting or analysis code.
-10. New top-level modules should be introduced only when the functionality cannot naturally belong to an existing scientific concept.
+6. General detector-response calculations belong in `detector/`; published detector-response tables belong in `datasets/`.
+7. Do not duplicate functionality already provided well by established scientific packages without a clear scientific reason.
+8. Avoid generic dumping-ground modules such as `utils.py`, `helpers.py`, and `misc.py`.
+9. Tests verify software behavior; validation verifies scientific correctness.
+10. Data provenance, units, conventions, assumptions, and citations are part of the scientific result and must not be hidden in plotting or analysis code.
+11. Distinct scientific products from the same published release should remain distinct dataset interfaces even when they share one source file or archive.
+12. New top-level modules should be introduced only when the functionality cannot naturally belong to an existing scientific concept.
 
 ## Planned package structure
 
-The following structure describes the intended organization of MAHAM. Not every
-module is expected to contain implemented functionality during the early stages
-of development.
+The following structure describes the intended organization of MAHAM. Not every module is expected to contain implemented functionality during the early stages of development.
 
+```text
 maham/
 │
 ├── src/
@@ -205,7 +236,8 @@ maham/
 │       │   ├── limits/
 │       │   │   ├── __init__.py
 │       │   │   ├── neutrino/
-│       │   │   │   └── __init__.py
+│       │   │   │   ├── __init__.py
+│       │   │   │   └── icecube_ehe_2025.py
 │       │   │   ├── cosmic_ray/
 │       │   │   │   └── __init__.py
 │       │   │   └── gamma_ray/
@@ -214,6 +246,16 @@ maham/
 │       │   │   ├── __init__.py
 │       │   │   ├── neutrino/
 │       │   │   │   └── __init__.py
+│       │   │   ├── cosmic_ray/
+│       │   │   │   └── __init__.py
+│       │   │   └── gamma_ray/
+│       │   │       └── __init__.py
+│       │   ├── effective_area/
+│       │   │   ├── __init__.py
+│       │   │   ├── base.py
+│       │   │   ├── neutrino/
+│       │   │   │   ├── __init__.py
+│       │   │   │   └── icecube_ehe_2025.py
 │       │   │   ├── cosmic_ray/
 │       │   │   │   └── __init__.py
 │       │   │   └── gamma_ray/
@@ -247,6 +289,10 @@ maham/
 │       │       │   ├── neutrino/
 │       │       │   ├── cosmic_ray/
 │       │       │   └── gamma_ray/
+│       │       ├── effective_area/
+│       │       │   ├── neutrino/
+│       │       │   ├── cosmic_ray/
+│       │       │   └── gamma_ray/
 │       │       └── events/
 │       ├── integrations/
 │       │   ├── __init__.py
@@ -272,7 +318,8 @@ maham/
 │   ├── radio/
 │   ├── models/
 │   ├── datasets/
-│   │   └── test_icecube_glashow.py
+│   │   ├── test_icecube_glashow.py
+│   │   └── test_icecube_ehe_2025.py
 │   ├── integrations/
 │   └── plotting/
 │
@@ -317,19 +364,15 @@ maham/
 ├── README.md
 ├── LICENSE
 └── .gitignore
+```
 
-
-The tree above describes the intended organization of MAHAM. It defines where
-future functionality belongs but does not imply that every planned module is
-already implemented.
+The tree above describes the intended organization of MAHAM. It defines where future functionality belongs but does not imply that every planned module is already implemented.
 
 Python modules contain scientific interfaces, calculations, and metadata logic.
-Numerical tables distributed with MAHAM are stored separately under
-`src/maham/data/`.
 
-The same conceptual hierarchy is used for code and data where practical so that
-the relationship between an implementation and its associated numerical data
-remains clear.
+Numerical tables distributed with MAHAM are stored separately under `src/maham/data/`.
+
+The same conceptual hierarchy is used for code and data where practical so that the relationship between an implementation and its associated numerical data remains clear.
 
 ## Scientific naming conventions
 
@@ -342,6 +385,9 @@ Examples include:
 - `phi` for differential flux
 - `nu` for neutrino
 - `nubar` for antineutrino
+- `nue` for electron neutrino
+- `numu` for muon neutrino
+- `nutau` for tau neutrino
 
 Unicode mathematical symbols are not required to identify scientific quantities in the MAHAM API.
 
@@ -356,3 +402,5 @@ For example:
 `per_flavor -> all_flavor` uses a factor of 3 only when `flavor_assumption="equal"` is explicitly requested.
 
 The original flavor convention of every published dataset is retained in its metadata.
+
+Flavor sums and particle/antiparticle conventions in detector-response datasets must also be explicit. For example, an effective area that is summed across `nue`, `numu`, and `nutau`, or averaged between `nu` and `nubar`, should record those conventions in metadata rather than relying on column names alone.
