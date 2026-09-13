@@ -54,6 +54,7 @@ class DatasetMetadata:
     dataset_reference: Reference | None = None
     confidence_level: float | None = None
     quantity: str | None = None
+    spectral_kind: str | None = None
     energy_unit: str | None = None
     value_unit: str | None = None
     flavor_convention: str | None = None

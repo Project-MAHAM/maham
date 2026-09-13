@@ -21,6 +21,7 @@ class IceCubeEHESensitivity2025(NeutrinoSpectrumDataset):
         year=2025,
         confidence_level=0.90,
         quantity="E2phi",
+        spectral_kind="differential_intensity",
         energy_unit="GeV",
         value_unit="GeV cm-2 s-1 sr-1",
         flavor_convention="all_flavor",

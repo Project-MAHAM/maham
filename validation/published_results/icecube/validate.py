@@ -103,7 +103,7 @@ def plot_flux_results(limit, sensitivity, glashow):
     ax.set_title("IceCube Neutrino Flux Results")
     ax.grid(True, which="both", alpha=0.25)
 
-    ax.text(0.97, 0.06, r"All flavors" "\n" r"$\nu_e:\nu_\mu:\nu_\tau=1:1:1$" "\n" r"$\nu:\bar{\nu}=1:1$", transform=ax.transAxes, ha="right", va="bottom", fontweight="bold")
+    ax.text(0.97, 0.02, r"All flavors" "\n" r"$\nu_e:\nu_\mu:\nu_\tau=1:1:1$, $\nu:\bar{\nu}=1:1$", transform=ax.transAxes, ha="right", va="bottom", fontweight="bold")
 
     bold_tick_labels(ax)
     bold_legend(ax.legend(loc="upper right"))

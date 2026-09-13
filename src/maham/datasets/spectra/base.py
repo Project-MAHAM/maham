@@ -3,7 +3,7 @@ from abc import abstractmethod
 from astropy.table import QTable, Table
 
 from maham.datasets.base import Dataset
-from maham.spectra.conversions import convert_spectral_quantity, normalize_spectral_quantity
+from maham.spectra.conversions import convert_differential_intensity, convert_spectral_quantity, normalize_spectral_quantity, spectral_quantity_info
 
 
 class SpectrumDataset(Dataset):
@@ -25,15 +25,6 @@ class SpectrumDataset(Dataset):
         table.meta["quantity"] = native_quantity
         return table if quantity is None else self._convert_quantity(table, quantity)
 
-    def load_phi(self, cache: bool = True, show_progress: bool = True) -> QTable:
-        return self.load(quantity="phi", cache=cache, show_progress=show_progress)
-
-    def load_ephi(self, cache: bool = True, show_progress: bool = True) -> QTable:
-        return self.load(quantity="Ephi", cache=cache, show_progress=show_progress)
-
-    def load_e2phi(self, cache: bool = True, show_progress: bool = True) -> QTable:
-        return self.load(quantity="E2phi", cache=cache, show_progress=show_progress)
-
     def _native_quantity(self) -> str:
         if self.metadata.quantity is None:
             raise ValueError(f"Spectrum dataset '{self.id}' has no native quantity defined.")
@@ -42,23 +33,39 @@ class SpectrumDataset(Dataset):
     def _convert_quantity(self, table: QTable, quantity: str) -> QTable:
         source = self._native_quantity()
         target = normalize_spectral_quantity(quantity)
+        source_family, _ = spectral_quantity_info(source)
+        target_family, _ = spectral_quantity_info(target)
         result = table.copy(copy_data=True)
         result.meta["native_quantity"] = source
+
         if target == source:
             result.meta["quantity"] = target
             return result
+
         if "energy" not in result.colnames:
             raise ValueError(f"Spectrum dataset '{self.id}' has no standardized 'energy' column.")
-        for suffix in ("", "_lower", "_upper"):
+
+        if source_family == target_family:
+            converter = convert_spectral_quantity
+        elif self.metadata.spectral_kind == "differential_intensity":
+            converter = convert_differential_intensity
+        else:
+            raise ValueError(f"Spectrum dataset '{self.id}' does not permit conversion between '{source_family}' and '{target_family}' notation.")
+
+        suffixes = ("", "_lower", "_upper", "_stat_err_lower", "_stat_err_upper", "_sys_err_lower", "_sys_err_upper")
+
+        for suffix in suffixes:
             source_column = f"{source}{suffix}"
             if source_column not in result.colnames:
                 continue
             target_column = f"{target}{suffix}"
             index = result.colnames.index(source_column)
-            converted = convert_spectral_quantity(result["energy"], result[source_column], source, target)
+            converted = converter(result["energy"], result[source_column], source, target)
             result.remove_column(source_column)
             result.add_column(converted, name=target_column, index=index)
+
         if target not in result.colnames:
             raise ValueError(f"Spectrum dataset '{self.id}' does not contain the expected native column '{source}'.")
+
         result.meta["quantity"] = target
         return result

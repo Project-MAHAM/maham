@@ -15,13 +15,28 @@ class NeutrinoSpectrumDataset(SpectrumDataset):
         return table if flavor is None else self._convert_flavor(table, flavor, flavor_assumption)
 
     def load_phi(self, flavor: str | None = None, flavor_assumption: str | None = None, cache: bool = True, show_progress: bool = True) -> QTable:
-        return self.load(quantity="phi", flavor=flavor, flavor_assumption=flavor_assumption, cache=cache, show_progress=show_progress)
+        return self.load("phi", flavor, flavor_assumption, cache, show_progress)
 
     def load_ephi(self, flavor: str | None = None, flavor_assumption: str | None = None, cache: bool = True, show_progress: bool = True) -> QTable:
-        return self.load(quantity="Ephi", flavor=flavor, flavor_assumption=flavor_assumption, cache=cache, show_progress=show_progress)
+        return self.load("Ephi", flavor, flavor_assumption, cache, show_progress)
 
     def load_e2phi(self, flavor: str | None = None, flavor_assumption: str | None = None, cache: bool = True, show_progress: bool = True) -> QTable:
-        return self.load(quantity="E2phi", flavor=flavor, flavor_assumption=flavor_assumption, cache=cache, show_progress=show_progress)
+        return self.load("E2phi", flavor, flavor_assumption, cache, show_progress)
+
+    def load_e3phi(self, flavor: str | None = None, flavor_assumption: str | None = None, cache: bool = True, show_progress: bool = True) -> QTable:
+        return self.load("E3phi", flavor, flavor_assumption, cache, show_progress)
+
+    def load_j(self, flavor: str | None = None, flavor_assumption: str | None = None, cache: bool = True, show_progress: bool = True) -> QTable:
+        return self.load("J", flavor, flavor_assumption, cache, show_progress)
+
+    def load_ej(self, flavor: str | None = None, flavor_assumption: str | None = None, cache: bool = True, show_progress: bool = True) -> QTable:
+        return self.load("EJ", flavor, flavor_assumption, cache, show_progress)
+
+    def load_e2j(self, flavor: str | None = None, flavor_assumption: str | None = None, cache: bool = True, show_progress: bool = True) -> QTable:
+        return self.load("E2J", flavor, flavor_assumption, cache, show_progress)
+
+    def load_e3j(self, flavor: str | None = None, flavor_assumption: str | None = None, cache: bool = True, show_progress: bool = True) -> QTable:
+        return self.load("E3J", flavor, flavor_assumption, cache, show_progress)
 
     def _native_flavor_convention(self) -> str:
         if self.metadata.flavor_convention is None:
@@ -33,14 +48,17 @@ class NeutrinoSpectrumDataset(SpectrumDataset):
         target = normalize_flavor_convention(flavor)
         result = table.copy(copy_data=True)
         result.meta["native_flavor_convention"] = self._native_flavor_convention()
+
         if target == source:
             result.meta["flavor_convention"] = target
             return result
+
         quantity = result.meta["quantity"]
-        for suffix in ("", "_lower", "_upper"):
+        for suffix in ("", "_lower", "_upper", "_stat_err_lower", "_stat_err_upper", "_sys_err_lower", "_sys_err_upper"):
             column = f"{quantity}{suffix}"
             if column in result.colnames:
                 result[column] = convert_flavor_convention(result[column], source, target, flavor_assumption)
+
         result.meta["flavor_convention"] = target
         result.meta["flavor_assumption"] = "equal"
         return result

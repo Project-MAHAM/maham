@@ -23,6 +23,7 @@ class IceCubeGlashowFlux2021(NeutrinoSpectrumDataset):
         confidence_level=0.683,
         quantity="E2phi",
         energy_unit="GeV",
+        spectral_kind="differential_intensity",
         value_unit="GeV cm-2 s-1 sr-1",
         flavor_convention="per_flavor",
         solid_angle_convention="per_sr",

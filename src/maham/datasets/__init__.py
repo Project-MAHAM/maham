@@ -7,5 +7,7 @@ from maham.datasets.sensitivities.neutrino.icecube_ehe_2025 import IceCubeEHESen
 from maham.datasets.spectra.base import SpectrumDataset
 from maham.datasets.spectra.neutrino.base import NeutrinoSpectrumDataset
 from maham.datasets.spectra.neutrino.icecube_glashow_2021 import IceCubeGlashowFlux2021
+from maham.datasets.spectra.cosmic_ray.auger_spectrum_2021 import AugerCombinedSpectrum2021
+from maham.datasets.spectra.cosmic_ray.base import CosmicRaySpectrumDataset
 
-__all__ = ["Dataset", "SpectrumDataset", "NeutrinoSpectrumDataset", "EffectiveAreaDataset", "IceCubeGlashowFlux2021", "IceCubeEHELimit2025", "IceCubeEHESensitivity2025", "IceCubeEHEEffectiveArea2025", "get_dataset", "list_datasets", "register_dataset"]
+__all__ = ["Dataset", "SpectrumDataset", "NeutrinoSpectrumDataset", "CosmicRaySpectrumDataset", "EffectiveAreaDataset", "IceCubeGlashowFlux2021", "IceCubeEHELimit2025", "IceCubeEHESensitivity2025", "IceCubeEHEEffectiveArea2025", "AugerCombinedSpectrum2021", "get_dataset", "list_datasets", "register_dataset"]

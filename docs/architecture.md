@@ -145,7 +145,6 @@ The following structure describes the intended organization of MAHAM. Not every 
 
 ```text
 maham/
-│
 ├── src/
 │   └── maham/
 │       ├── __init__.py
@@ -230,7 +229,9 @@ maham/
 │       │   │   │   ├── base.py
 │       │   │   │   └── icecube_glashow_2021.py
 │       │   │   ├── cosmic_ray/
-│       │   │   │   └── __init__.py
+│       │   │   │   ├── __init__.py
+│       │   │   │   ├── base.py
+│       │   │   │   └── auger_spectrum_2021.py
 │       │   │   └── gamma_ray/
 │       │   │       └── __init__.py
 │       │   ├── limits/
@@ -307,7 +308,6 @@ maham/
 │           ├── limits.py
 │           ├── detector.py
 │           └── sky.py
-│
 ├── tests/
 │   ├── physics/
 │   ├── spectra/
@@ -320,20 +320,30 @@ maham/
 │   ├── radio/
 │   ├── models/
 │   ├── datasets/
+│   │   ├── test_auger_spectrum_2021.py
 │   │   ├── test_icecube_glashow.py
 │   │   └── test_icecube_ehe_2025.py
 │   ├── integrations/
 │   └── plotting/
-│
 ├── validation/
 │   ├── README.md
-│   └── published_results/
-│       └── icecube/
+│   ├── published_results/
+│   │   ├── icecube/
+│   │   │   ├── README.md
+│   │   │   ├── validate.py
+│   │   │   └── outputs/
+│   │   │       └── .gitignore
+│   │   └── auger/
+│   │       ├── README.md
+│   │       ├── validate.py
+│   │       └── outputs/
+│   │           └── .gitignore
+│   └── comparisons/
+│       └── diffuse_spectra/
 │           ├── README.md
-│           ├── validate.py
+│           ├── compare.py
 │           └── outputs/
 │               └── .gitignore
-│
 ├── examples/
 │   ├── physics/
 │   ├── spectra/
@@ -344,10 +354,8 @@ maham/
 │   ├── radio/
 │   ├── models/
 │   └── datasets/
-│
 ├── benchmarks/
 │   └── README.md
-│
 ├── docs/
 │   ├── architecture.md
 │   ├── getting_started/
@@ -356,12 +364,10 @@ maham/
 │   ├── datasets/
 │   ├── validation/
 │   └── api/
-│
 ├── .github/
 │   ├── workflows/
 │   ├── ISSUE_TEMPLATE/
 │   └── PULL_REQUEST_TEMPLATE.md
-│
 ├── pyproject.toml
 ├── CITATION.cff
 ├── CONTRIBUTING.md
@@ -411,3 +417,24 @@ For example:
 The original flavor convention of every published dataset is retained in its metadata.
 
 Flavor sums and particle/antiparticle conventions in detector-response datasets must also be explicit. For example, an effective area that is summed across `nue`, `numu`, and `nutau`, or averaged between `nu` and `nubar`, should record those conventions in metadata rather than relying on column names alone.
+
+### Spectral conventions
+
+MAHAM distinguishes a dataset's native spectral notation from derived representations.
+
+Supported notation families currently include:
+
+- `phi`, `Ephi`, `E2phi`, `E3phi`
+- `J`, `EJ`, `E2J`, `E3J`
+
+Energy weighting within one notation family is a direct mathematical conversion.
+
+Conversion between `J` and `phi` is allowed only for datasets explicitly marked with:
+
+`spectral_kind="differential_intensity"`
+
+This prevents unrelated quantities such as point-source fluxes from being silently reinterpreted as diffuse intensities.
+
+Arbitrary energy weighting, including conventions such as `E^2.6 J`, is provided through the spectrum-weighting API.
+
+Experiment-specific scientific validation reproduces the native publication convention. Cross-experiment comparisons may use a common derived representation and common physical units.
