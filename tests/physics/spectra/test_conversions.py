@@ -2,8 +2,7 @@ import astropy.units as u
 import numpy as np
 import pytest
 
-from maham.spectra import apply_energy_weighting, convert_differential_intensity, convert_spectral_quantity
-
+from maham.physics.spectra import apply_energy_weighting, convert_differential_intensity, convert_spectral_quantity
 
 def test_phi_to_Ephi():
     energy = 1e6 * u.GeV

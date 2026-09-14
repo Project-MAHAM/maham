@@ -1,16 +1,12 @@
 MAHAM/
-│
 ├── src/
 │   └── maham/
-│       │
 │       ├── __init__.py
-│       │
 │       ├── _core/
 │       │   ├── __init__.py
 │       │   ├── metadata.py
 │       │   ├── units.py
 │       │   └── typing.py
-│       │
 │       ├── physics/
 │       │   ├── __init__.py
 │       │   ├── particles/
@@ -19,15 +15,15 @@ MAHAM/
 │       │   │   └── __init__.py
 │       │   ├── interactions/
 │       │   │   └── __init__.py
-│       │   └── propagation/
-│       │       └── __init__.py
-│       │
-│       ├── spectra/
-│       │   ├── __init__.py
-│       │   ├── conversions.py
-│       │   ├── flavor.py
-│       │   └── weighting.py
-│       │
+│       │   ├── propagation/
+│       │   │   └── __init__.py
+│       │   ├── spectra/
+│       │   │   ├── __init__.py
+│       │   │   ├── conversions.py
+│       │   │   └── weighting.py
+│       │   └── neutrino/
+│       │       ├── __init__.py
+│       │       └── flavor.py
 │       ├── statistics/
 │       │   ├── __init__.py
 │       │   ├── counting/
@@ -38,7 +34,6 @@ MAHAM/
 │       │   │   └── __init__.py
 │       │   └── hypothesis/
 │       │       └── __init__.py
-│       │
 │       ├── detector/
 │       │   ├── __init__.py
 │       │   ├── response/
@@ -49,7 +44,6 @@ MAHAM/
 │       │   │   └── __init__.py
 │       │   └── sensitivity/
 │       │       └── __init__.py
-│       │
 │       ├── astronomy/
 │       │   ├── __init__.py
 │       │   ├── coordinates/
@@ -60,7 +54,6 @@ MAHAM/
 │       │   │   └── __init__.py
 │       │   └── skymap/
 │       │       └── __init__.py
-│       │
 │       ├── multimessenger/
 │       │   ├── __init__.py
 │       │   ├── coincidence/
@@ -69,7 +62,6 @@ MAHAM/
 │       │   │   └── __init__.py
 │       │   └── transients/
 │       │       └── __init__.py
-│       │
 │       ├── radio/
 │       │   ├── __init__.py
 │       │   ├── antenna/
@@ -80,12 +72,10 @@ MAHAM/
 │       │   │   └── __init__.py
 │       │   └── noise/
 │       │       └── __init__.py
-│       │
 │       ├── models/
 │       │   ├── __init__.py
 │       │   ├── base.py
 │       │   ├── registry.py
-│       │   │
 │       │   ├── flux/
 │       │   │   ├── __init__.py
 │       │   │   ├── neutrino/
@@ -94,7 +84,6 @@ MAHAM/
 │       │   │   │   └── __init__.py
 │       │   │   └── gamma_ray/
 │       │   │       └── __init__.py
-│       │   │
 │       │   ├── cross_sections/
 │       │   │   └── __init__.py
 │       │   ├── sources/
@@ -105,42 +94,49 @@ MAHAM/
 │       │   │   └── __init__.py
 │       │   └── populations/
 │       │       └── __init__.py
-│       │
 │       ├── datasets/
 │       │   ├── __init__.py
 │       │   ├── base.py
 │       │   ├── registry.py
-│       │   │
 │       │   ├── spectra/
 │       │   │   ├── __init__.py
 │       │   │   ├── base.py
-│       │   │   │
 │       │   │   ├── neutrino/
 │       │   │   │   ├── __init__.py
 │       │   │   │   ├── base.py
 │       │   │   │   ├── icecube_glashow_2021.py
-│       │   │   │   ├── icecube_ehe_2025.py
 │       │   │   │   ├── icecube_combined_2015.py
 │       │   │   │   ├── icecube_throughgoing_muon_2022.py
+│       │   │   │   ├── icecube_ngc1068_2022.py
+│       │   │   │   ├── icecube_txs0506_flare_2018.py
 │       │   │   │   └── km3net_230213a_flux_2025.py
-│       │   │   │
 │       │   │   ├── cosmic_ray/
 │       │   │   │   ├── __init__.py
 │       │   │   │   ├── base.py
 │       │   │   │   ├── auger_combined_2021.py
 │       │   │   │   └── telescope_array_combined_2023.py
-│       │   │   │
 │       │   │   └── gamma_ray/
 │       │   │       ├── __init__.py
 │       │   │       ├── base.py
 │       │   │       └── fermi_lat_igrb_egb_2015.py
-│       │   │
 │       │   ├── limits/
-│       │   │   └── __init__.py
-│       │   │
+│       │   │   ├── __init__.py
+│       │   │   ├── cosmic_ray/
+│       │   │   │   └── __init__.py
+│       │   │   ├── gamma_ray/
+│       │   │   │   └── __init__.py
+│       │   │   └── neutrino/
+│       │   │       ├── __init__.py
+│       │   │       └── icecube_ehe_2025.py
 │       │   ├── sensitivities/
-│       │   │   └── __init__.py
-│       │   │
+│       │   │   ├── __init__.py
+│       │   │   ├── cosmic_ray/
+│       │   │   │   └── __init__.py
+│       │   │   ├── gamma_ray/
+│       │   │   │   └── __init__.py
+│       │   │   └── neutrino/
+│       │   │       ├── __init__.py
+│       │   │       └── icecube_ehe_2025.py
 │       │   ├── effective_area/
 │       │   │   ├── __init__.py
 │       │   │   ├── base.py
@@ -148,15 +144,12 @@ MAHAM/
 │       │   │       ├── __init__.py
 │       │   │       ├── icecube_ehe_2025.py
 │       │   │       └── km3net_230213a_2025.py
-│       │   │
 │       │   └── events/
 │       │       ├── __init__.py
 │       │       └── neutrino/
 │       │           ├── __init__.py
 │       │           └── km3net_230213a_2025.py
-│       │
 │       ├── data/
-│       │   │
 │       │   ├── models/
 │       │   │   ├── flux/
 │       │   │   │   ├── neutrino/
@@ -167,24 +160,21 @@ MAHAM/
 │       │   │   ├── attenuation/
 │       │   │   ├── backgrounds/
 │       │   │   └── populations/
-│       │   │
 │       │   └── datasets/
 │       │       ├── spectra/
 │       │       │   ├── neutrino/
-│       │       │   │   └── icecube_throughgoing_muon_piecewise_2022.csv
+│       │       │   │   ├── icecube_throughgoing_muon_piecewise_2022.csv
+│       │       │   │   ├── icecube_ngc1068_flux_2022.csv
+│       │       │   │   └── icecube_txs0506_flare_flux_2018.csv
 │       │       │   ├── cosmic_ray/
 │       │       │   │   └── telescope_array_combined_2023_digitized.csv
 │       │       │   └── gamma_ray/
-│       │       │
 │       │       ├── limits/
 │       │       ├── sensitivities/
-│       │       │
 │       │       ├── effective_area/
 │       │       │   └── neutrino/
-│       │       │
 │       │       └── events/
 │       │           └── neutrino/
-│       │
 │       ├── integrations/
 │       │   ├── __init__.py
 │       │   ├── nuradio/
@@ -193,62 +183,48 @@ MAHAM/
 │       │   │   └── __init__.py
 │       │   └── healpy/
 │       │       └── __init__.py
-│       │
 │       └── plotting/
 │           ├── __init__.py
 │           ├── style.py
-│           ├── spectra.py
-│           ├── limits.py
-│           ├── detector.py
-│           └── sky.py
-│
+│           └── limits.py
 ├── tests/
 │   ├── __init__.py
-│   │
 │   ├── core/
 │   │   ├── test_metadata.py
 │   │   └── test_units.py
-│   │
 │   ├── physics/
+│   │   ├── spectra/
+│   │   │   └── test_conversions.py
+│   │   ├── neutrino/
+│   │   │   └── test_flavor.py
 │   │   ├── particles/
 │   │   ├── kinematics/
 │   │   ├── interactions/
 │   │   └── propagation/
-│   │
-│   ├── spectra/
-│   │   ├── test_conversions.py
-│   │   ├── test_flavor.py
-│   │   └── test_weighting.py
-│   │
 │   ├── statistics/
 │   │   ├── counting/
 │   │   ├── intervals/
 │   │   ├── likelihood/
 │   │   └── hypothesis/
-│   │
 │   ├── detector/
 │   │   ├── response/
 │   │   ├── exposure/
 │   │   ├── rates/
 │   │   └── sensitivity/
-│   │
 │   ├── astronomy/
 │   │   ├── coordinates/
 │   │   ├── time/
 │   │   ├── visibility/
 │   │   └── skymap/
-│   │
 │   ├── multimessenger/
 │   │   ├── coincidence/
 │   │   ├── association/
 │   │   └── transients/
-│   │
 │   ├── radio/
 │   │   ├── antenna/
 │   │   ├── transmission/
 │   │   ├── polarization/
 │   │   └── noise/
-│   │
 │   ├── models/
 │   │   ├── test_base.py
 │   │   ├── test_registry.py
@@ -261,7 +237,6 @@ MAHAM/
 │   │   ├── attenuation/
 │   │   ├── backgrounds/
 │   │   └── populations/
-│   │
 │   ├── datasets/
 │   │   ├── test_base.py
 │   │   ├── test_registry.py
@@ -269,71 +244,58 @@ MAHAM/
 │   │   ├── test_icecube_ehe_2025.py
 │   │   ├── test_icecube_combined_2015.py
 │   │   ├── test_icecube_throughgoing_muon_2022.py
+│   │   ├── test_icecube_ngc1068_2022.py
+│   │   ├── test_icecube_txs0506_flare_2018.py
 │   │   ├── test_auger_combined_2021.py
 │   │   ├── test_telescope_array_combined_2023.py
 │   │   ├── test_fermi_lat_igrb_egb_2015.py
 │   │   ├── test_km3net_230213a_2025.py
 │   │   ├── test_km3net_230213a_flux_2025.py
 │   │   └── test_km3net_230213a_effective_area_2025.py
-│   │
 │   ├── integrations/
 │   │   ├── nuradio/
 │   │   ├── root/
 │   │   └── healpy/
-│   │
 │   └── plotting/
 │       ├── test_style.py
-│       ├── test_spectra.py
-│       ├── test_limits.py
-│       ├── test_detector.py
-│       └── test_sky.py
-│
+│       └── test_limits.py
 ├── validation/
 │   ├── README.md
-│   │
 │   ├── published_results/
-│   │   │
 │   │   ├── icecube/
 │   │   │   ├── README.md
 │   │   │   ├── validate.py
 │   │   │   └── outputs/
 │   │   │       └── .gitignore
-│   │   │
 │   │   ├── auger/
 │   │   │   ├── README.md
 │   │   │   ├── validate.py
 │   │   │   └── outputs/
 │   │   │       └── .gitignore
-│   │   │
 │   │   ├── telescope_array/
 │   │   │   ├── README.md
 │   │   │   ├── validate.py
 │   │   │   └── outputs/
 │   │   │       └── .gitignore
-│   │   │
 │   │   ├── fermi_lat/
 │   │   │   ├── README.md
 │   │   │   ├── validate.py
 │   │   │   └── outputs/
 │   │   │       └── .gitignore
-│   │   │
 │   │   └── km3net/
 │   │       ├── README.md
 │   │       ├── validate.py
 │   │       └── outputs/
 │   │           └── .gitignore
-│   │
 │   └── comparisons/
 │       └── diffuse_spectra/
 │           ├── README.md
 │           ├── compare.py
 │           └── outputs/
 │               └── .gitignore
-│
 ├── examples/
 │   ├── README.md
 │   ├── physics/
-│   ├── spectra/
 │   ├── statistics/
 │   ├── detector/
 │   ├── astronomy/
@@ -341,47 +303,34 @@ MAHAM/
 │   ├── radio/
 │   ├── models/
 │   └── datasets/
-│
 ├── benchmarks/
 │   └── README.md
-│
 ├── docs/
 │   ├── architecture.md
-│   │
 │   ├── getting_started/
 │   │   ├── installation.md
 │   │   └── quickstart.md
-│   │
 │   ├── user_guide/
-│   │   ├── spectra.md
 │   │   ├── datasets.md
 │   │   ├── models.md
 │   │   ├── detector.md
 │   │   ├── astronomy.md
 │   │   ├── multimessenger.md
 │   │   └── radio.md
-│   │
 │   ├── models/
 │   │   └── README.md
-│   │
 │   ├── datasets/
 │   │   └── README.md
-│   │
 │   ├── validation/
 │   │   └── README.md
-│   │
 │   └── api/
 │       └── README.md
-│
 ├── .github/
 │   ├── workflows/
 │   │   ├── tests.yml
 │   │   └── lint.yml
-│   │
 │   ├── ISSUE_TEMPLATE/
-│   │
 │   └── PULL_REQUEST_TEMPLATE.md
-│
 ├── pyproject.toml
 ├── CITATION.cff
 ├── CONTRIBUTING.md

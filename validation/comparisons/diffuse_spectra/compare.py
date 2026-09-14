@@ -8,10 +8,10 @@ import numpy as np
 
 from maham.datasets import get_dataset
 from maham.plotting import apply_plot_style, bold_legend, bold_tick_labels, plot_upper_limits
-from maham.spectra import normalize_spectral_quantity, spectral_quantity_info
+from maham.physics.spectra import normalize_spectral_quantity, spectral_quantity_info
 
 
-PLOT_QUANTITY = "E3phi"  # Try "E3J" or "E2phi" for the alternate common representation.
+PLOT_QUANTITY = "E2phi"  # Try "E3J" or "E2phi" for the alternate common representation.
 OUTPUT_DIR = Path(__file__).resolve().parent / "outputs"
 
 UNIT_LABELS = {
