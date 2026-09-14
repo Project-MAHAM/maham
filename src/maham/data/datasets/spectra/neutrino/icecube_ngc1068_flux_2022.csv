@@ -1,0 +1,2 @@
+reference_energy_TeV,phi0_TeV_inv_cm2_s,phi0_stat_err_TeV_inv_cm2_s,phi0_sys_err_TeV_inv_cm2_s,spectral_index,spectral_index_stat_err,spectral_index_sys_err,energy_min_TeV,energy_max_TeV,signal_events,signal_events_lower,signal_events_upper,ra_deg,dec_deg,global_significance_sigma
+1.0,5.0e-11,1.5e-11,0.6e-11,3.2,0.2,0.07,1.5,15.0,79,59,101,40.67,-0.01,4.2
