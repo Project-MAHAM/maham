@@ -49,6 +49,24 @@ def validate_glashow(glashow, glashow_all):
     require(u.allclose(glashow_all["E2phi"][1], 5.7e-9 * E2PHI_UNIT), "Glashow equal-flavor all-flavor conversion is reproduced")
 
 
+def validate_170922a(event):
+    require(len(event) == 1, "IceCube-170922A dataset contains one event")
+    require(event.meta["dataset_id"] == "icecube.170922a.2017", "IceCube-170922A dataset ID is correct")
+    require(event["event_name"][0] == "IceCube-170922A", "IceCube-170922A event name is reproduced")
+    require(event["instrument"][0] == "IceCube", "IceCube-170922A instrument is IceCube")
+    require(event["topology"][0] == "track", "IceCube-170922A topology is track-like")
+    require(event["selection"][0] == "EHE", "IceCube-170922A belongs to the EHE alert selection")
+    require(u.allclose(event["ra"][0], 77.43 * u.deg), "Published IceCube-170922A right ascension is reproduced")
+    require(u.allclose(event["dec"][0], 5.72 * u.deg), "Published IceCube-170922A declination is reproduced")
+    require(u.allclose(event["energy"][0], 290.0 * u.TeV), "Published most-probable parent-neutrino energy is reproduced")
+    require(u.allclose(event["energy_lower"][0], 183.0 * u.TeV), "Published 90% neutrino-energy lower bound is reproduced")
+    require(u.allclose(event["energy_upper"][0], 4.3 * u.PeV), "Published 90% neutrino-energy upper bound is reproduced")
+    require(u.allclose(event["deposited_muon_energy"][0], 23.7 * u.TeV), "Published deposited muon energy is reproduced")
+    require(np.isclose(event["signalness"][0], 0.565), "Published IceCube-170922A signalness is reproduced")
+    require(event["associated_source"][0] == "TXS 0506+056", "TXS 0506+056 association is retained")
+    require(event.meta["energy_spectral_assumption"] == "E^-2.13", "Parent-neutrino energy assumption is explicitly retained")
+
+
 def validate_combined(combined):
     require(len(combined) == 9, "Combined astrophysical spectrum contains 9 published energy bins")
     require(combined.meta["flavor_convention"] == "all_flavor", "Combined astrophysical spectrum is all-flavor")
@@ -281,7 +299,7 @@ def plot_ngc1068(ngc):
     y = ngc["E2phi"].to_value(E2PHI_POINT_SOURCE_UNIT)
 
     fig, ax = plt.subplots(figsize=(7, 5))
-    ax.loglog(energy, y, color="black", linewidth=2.2, label="NGC 1068")
+    ax.loglog(energy, y, color="black", linewidth=2.2, label="NGC 1068 (steady)")
     ax.set_xlabel(r"Neutrino energy, $E_{\nu}$ [GeV]")
     ax.set_ylabel(r"Flux, $E^{2}\Phi$ [GeV cm$^{-2}$ s$^{-1}$]")
     ax.set_title("IceCube NGC 1068 Point-Source Flux")
@@ -301,7 +319,7 @@ def plot_txs0506(txs):
     y = txs["E2phi"].to_value(E2PHI_POINT_SOURCE_UNIT)
 
     fig, ax = plt.subplots(figsize=(7, 5))
-    ax.loglog(energy, y, color="black", linewidth=2.2, label="TXS 0506+056")
+    ax.loglog(energy, y, color="black", linewidth=2.2, label="TXS 0506+056 (158-day flare)")
     ax.set_xlabel(r"Neutrino energy, $E_{\nu}$ [GeV]")
     ax.set_ylabel(r"Flux, $E^{2}\Phi$ [GeV cm$^{-2}$ s$^{-1}$]")
     ax.set_title("IceCube TXS 0506+056 2014-2015 Flare Flux")
@@ -353,6 +371,7 @@ def main():
     piecewise_all = get_dataset("icecube.throughgoing_muon_piecewise_flux.2022").load_e2phi(flavor="all_flavor", flavor_assumption="equal")
     ngc1068 = get_dataset("icecube.ngc1068_flux.2022").load_e2phi()
     txs0506 = get_dataset("icecube.txs0506_flare_flux.2018").load_e2phi()
+    icecube_170922a = get_dataset("icecube.170922a.2017").load()
 
     print("EHE 2025 limit and sensitivity:")
     validate_ehe(limit, sensitivity)
@@ -371,6 +390,9 @@ def main():
 
     print("\nTXS 0506+056 flare flux 2018:")
     validate_txs0506(txs0506)
+
+    print("\nIceCube-170922A event 2017:")
+    validate_170922a(icecube_170922a)
 
     print("\nEHE 2025 effective area:")
     validate_effective_area(area)

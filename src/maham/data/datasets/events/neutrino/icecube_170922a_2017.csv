@@ -1,0 +1,2 @@
+event_name,time_utc,mjd_catalog,topology,selection,ra_deg,ra_err_minus_deg,ra_err_plus_deg,dec_deg,dec_err_minus_deg,dec_err_plus_deg,deposited_muon_energy_TeV,deposited_muon_energy_err_TeV,neutrino_energy_mode_TeV,neutrino_energy_90_lower_TeV,neutrino_energy_90_upper_TeV,neutrino_spectral_index,signalness,associated_source
+IceCube-170922A,2017-09-22T20:54:30.43,58018.871,track,EHE,77.43,0.65,0.95,5.72,0.30,0.50,23.7,2.8,290.0,183.0,4300.0,2.13,0.565,TXS 0506+056
