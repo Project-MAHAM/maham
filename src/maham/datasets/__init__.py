@@ -11,5 +11,10 @@ from maham.datasets.spectra.cosmic_ray.auger_spectrum_2021 import AugerCombinedS
 from maham.datasets.spectra.cosmic_ray.base import CosmicRaySpectrumDataset
 from maham.datasets.spectra.cosmic_ray.telescope_array_combined_2023 import TelescopeArrayCombinedSpectrum2023
 from maham.datasets.spectra.gamma_ray.fermi_lat_igrb_egb_2015 import FermiLATEGB2015, FermiLATIGRB2015
+from maham.datasets.events import KM3NeT230213A2025
+from maham.datasets.spectra.neutrino import KM3NeT230213AFlux2025
+from maham.datasets.effective_area.neutrino.km3net_230213a_2025 import KM3NeT230213AEffectiveArea2025
+from maham.datasets.spectra.neutrino.icecube_combined_2015 import IceCubeCombinedAstrophysicalFlux2015
+from maham.datasets.spectra.neutrino.icecube_throughgoing_muon_2022 import IceCubeThroughgoingMuonPiecewiseFlux2022
 
-__all__ = ["FermiLATIGRB2015", "FermiLATEGB2015", "Dataset", "SpectrumDataset", "NeutrinoSpectrumDataset", "CosmicRaySpectrumDataset", "EffectiveAreaDataset", "IceCubeGlashowFlux2021", "IceCubeEHELimit2025", "IceCubeEHESensitivity2025", "IceCubeEHEEffectiveArea2025", "AugerCombinedSpectrum2021", "get_dataset", "list_datasets", "register_dataset", "TelescopeArrayCombinedSpectrum2023",]
+__all__ = ["IceCubeThroughgoingMuonPiecewiseFlux2022", "IceCubeCombinedAstrophysicalFlux2015", "KM3NeT230213AEffectiveArea2025", "KM3NeT230213AFlux2025", "KM3NeT230213A2025", "FermiLATIGRB2015", "FermiLATEGB2015", "Dataset", "SpectrumDataset", "NeutrinoSpectrumDataset", "CosmicRaySpectrumDataset", "EffectiveAreaDataset", "IceCubeGlashowFlux2021", "IceCubeEHELimit2025", "IceCubeEHESensitivity2025", "IceCubeEHEEffectiveArea2025", "AugerCombinedSpectrum2021", "get_dataset", "list_datasets", "register_dataset", "TelescopeArrayCombinedSpectrum2023",]

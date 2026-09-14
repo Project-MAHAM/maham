@@ -14,6 +14,28 @@ The native published result is a per-flavor piecewise astrophysical neutrino flu
 
 The validation checks the native published representation and also constructs an explicit `1:1:1` all-flavor view for comparison with all-flavor EHE results.
 
+### IceCube Combined Astrophysical Spectrum 2015
+
+MAHAM dataset:
+
+`icecube.combined_astrophysical_flux.2015`
+
+The official IceCube release provides a nine-bin all-flavor `E2phi` astrophysical neutrino spectrum spanning `1e4` to `1e7 GeV`.
+
+MAHAM derives the 68% and 90% confidence intervals directly from the released profile-likelihood scans rather than using the approximate covariance-matrix errors. Bins 6, 8, and 9 have zero best-fit normalization and are represented as upper limits.
+
+
+### IceCube 9.5-Year Through-Going Muon Flux 2022
+
+MAHAM dataset:
+
+`icecube.throughgoing_muon_piecewise_flux.2022`
+
+The native result is a `nu_mu + nubar_mu` piece-wise astrophysical flux. Each segment has fixed spectral index `gamma=2.0`.
+
+Pieces 2-4 have 68.27% profile-likelihood intervals. Pieces 1 and 5 are 90% CL upper limits. MAHAM preserves these mixed confidence levels per row and provides an explicit equal-flavor conversion for comparisons requiring an all-flavor view.
+
+
 ### IceCube EHE 2025
 
 MAHAM datasets:
@@ -40,6 +62,8 @@ It verifies:
 - explicit per-flavor to all-flavor conversion
 - effective-area flavor summation
 - the local electron-neutrino effective-area enhancement near the Glashow resonance
+- combined-spectrum profile-likelihood intervals at 68% and 90%
+- physical-boundary treatment of zero-best-fit flux bins
 
 ## Outputs
 
@@ -49,6 +73,10 @@ The validation generates:
 - `icecube_flux_results.pdf`
 - `icecube_ehe_2025_effective_area.png`
 - `icecube_ehe_2025_effective_area.pdf`
+- `icecube_combined_2015_spectrum.png`
+- `icecube_combined_2015_spectrum.pdf`
+- `icecube_throughgoing_muon_2022_piecewise.png`
+- `icecube_throughgoing_muon_2022_piecewise.pdf`
 
 Generated files are written under `outputs/` and are not normally committed.
 
