@@ -12,6 +12,7 @@ apply_plot_style()
 
 OUTPUT_DIR = Path(__file__).parent / "outputs"
 E2PHI_UNIT = u.GeV / (u.cm**2 * u.s * u.sr)
+E2PHI_POINT_SOURCE_UNIT = u.GeV / (u.cm**2 * u.s)
 
 
 def require(condition, message):
@@ -84,10 +85,63 @@ def validate_throughgoing_muon(piecewise, piecewise_all):
     require(u.allclose(piecewise["E2phi_upper"], np.array([3.10, 3.02, 1.53, 0.55, 0.41]) * scale), "Published piece-wise upper bounds are reproduced")
     require(u.allclose(piecewise["energy_min"], [100, 15000, 104000, 721000, 5000000] * u.GeV), "Published piece-wise lower energy edges are reproduced")
     require(u.allclose(piecewise["energy_max"], [15000, 104000, 721000, 5000000, 100000000] * u.GeV), "Published piece-wise upper energy edges are reproduced")
-
     require(piecewise_all.meta["flavor_convention"] == "all_flavor", "Equal-flavor all-flavor view is explicitly constructed")
     require(piecewise_all.meta["flavor_assumption"] == "equal", "All-flavor view records the equal-flavor assumption")
     require(u.allclose(piecewise_all["E2phi"], 3 * piecewise["E2phi"]), "Equal-flavor all-flavor conversion is reproduced")
+
+
+def validate_ngc1068(ngc):
+    require(len(ngc) == 64, "NGC 1068 spectrum contains 64 generated best-fit points")
+    require(ngc.meta["quantity"] == "E2phi", "NGC 1068 validation uses E2phi")
+    require(ngc.meta["flavor_convention"] == "numu_nubar", "NGC 1068 native flux is nu_mu + nubar_mu")
+    require(ngc.meta["solid_angle_convention"] == "point_source", "NGC 1068 is represented as a point-source flux")
+    require(ngc.meta["spectral_model"] == "unbroken_power_law", "NGC 1068 spectral model is an unbroken power law")
+    require(np.isclose(ngc.meta["phi0_TeV_inv_cm2_s"], 5.0e-11), "Published NGC 1068 normalization is reproduced")
+    require(np.isclose(ngc.meta["spectral_index"], 3.2), "Published NGC 1068 spectral index is reproduced")
+    require(np.isclose(ngc.meta["energy_min_TeV"], 1.5), "NGC 1068 characteristic energy range begins at 1.5 TeV")
+    require(np.isclose(ngc.meta["energy_max_TeV"], 15.0), "NGC 1068 characteristic energy range ends at 15 TeV")
+    require(ngc.meta["signal_events"] == 79, "Published NGC 1068 best-fit signal count is reproduced")
+    require(ngc.meta["signal_events_lower"] == 59, "Published NGC 1068 lower signal-count bound is reproduced")
+    require(ngc.meta["signal_events_upper"] == 101, "Published NGC 1068 upper signal-count bound is reproduced")
+    require(np.isclose(ngc.meta["global_significance_sigma"], 4.2), "Published NGC 1068 global significance is reproduced")
+    require(np.all(np.diff(ngc["energy"].to_value(u.GeV)) > 0), "NGC 1068 energy grid is strictly increasing")
+    require(np.all(ngc["E2phi"].to_value(E2PHI_POINT_SOURCE_UNIT) > 0), "NGC 1068 E2phi values are positive")
+
+    energy = ngc["energy"]
+    phi0 = ngc.meta["phi0_TeV_inv_cm2_s"] / (u.TeV * u.cm**2 * u.s)
+    gamma = ngc.meta["spectral_index"]
+    expected = (phi0 * (energy / (1.0 * u.TeV)) ** (-gamma) * energy**2).to(E2PHI_POINT_SOURCE_UNIT)
+    require(u.allclose(ngc["E2phi"], expected, rtol=1e-12), "NGC 1068 E2phi curve reproduces the published best-fit power law")
+
+
+def validate_txs0506(txs):
+    require(len(txs) == 64, "TXS 0506+056 flare spectrum contains 64 generated best-fit points")
+    require(txs.meta["quantity"] == "E2phi", "TXS 0506+056 validation uses E2phi")
+    require(txs.meta["flavor_convention"] == "numu_nubar", "TXS 0506+056 native flux is nu_mu + nubar_mu")
+    require(txs.meta["solid_angle_convention"] == "point_source", "TXS 0506+056 is represented as a point-source flux")
+    require(txs.meta["spectral_model"] == "unbroken_power_law", "TXS 0506+056 spectral model is an unbroken power law")
+    require(np.isclose(txs.meta["phi100_TeV_inv_cm2_s"], 1.6e-15), "Published TXS normalization is reproduced")
+    require(np.isclose(txs.meta["phi100_lower_TeV_inv_cm2_s"], 1.0e-15), "Published TXS lower normalization bound is reproduced")
+    require(np.isclose(txs.meta["phi100_upper_TeV_inv_cm2_s"], 2.3e-15), "Published TXS upper normalization bound is reproduced")
+    require(np.isclose(txs.meta["spectral_index"], 2.2), "Published TXS spectral index is reproduced")
+    require(np.isclose(txs.meta["spectral_index_err"], 0.2), "Published TXS spectral-index uncertainty is reproduced")
+    require(np.isclose(txs.meta["window_start_mjd"], 56937.81), "Published TXS flare start MJD is reproduced")
+    require(np.isclose(txs.meta["window_end_mjd"], 57096.21), "Published TXS flare end MJD is reproduced")
+    require(np.isclose(txs.meta["window_duration_days"], 158.0), "Published TXS flare duration is reproduced")
+    require(txs.meta["signal_events"] == 13, "Published TXS signal-event count is reproduced")
+    require(txs.meta["signal_events_err"] == 5, "Published TXS signal-event uncertainty is reproduced")
+    require(np.isclose(txs.meta["global_significance_sigma"], 3.5), "Published TXS global significance is reproduced")
+    require(np.all(np.diff(txs["energy"].to_value(u.GeV)) > 0), "TXS energy grid is strictly increasing")
+    require(np.all(txs["E2phi"].to_value(E2PHI_POINT_SOURCE_UNIT) > 0), "TXS E2phi values are positive")
+
+    energy = txs["energy"]
+    phi100 = txs.meta["phi100_TeV_inv_cm2_s"] / (u.TeV * u.cm**2 * u.s)
+    gamma = txs.meta["spectral_index"]
+    expected = (phi100 * (energy / (100.0 * u.TeV)) ** (-gamma) * energy**2).to(E2PHI_POINT_SOURCE_UNIT)
+    require(u.allclose(txs["E2phi"], expected, rtol=1e-12), "TXS E2phi curve reproduces the published best-fit power law")
+
+    fluence = ((100.0 * u.TeV) ** 2 * phi100 * (txs.meta["window_duration_days"] * u.day)).to(u.TeV / u.cm**2)
+    require(np.isclose(fluence.value, 2.18e-4, rtol=0.02), "TXS average flux reproduces the published box-window fluence")
 
 
 def validate_effective_area(area):
@@ -96,9 +150,8 @@ def validate_effective_area(area):
     require(np.all(np.diff(energy) > 0), "Effective-area energy grid is strictly increasing")
 
     flavor_sum = area["effective_area_nue"] + area["effective_area_numu"] + area["effective_area_nutau"]
-    relative_difference = np.abs((area["effective_area_total"] - flavor_sum) / area["effective_area_total"]).to_value(u.dimensionless_unscaled)
+    relative_difference = np.abs(((area["effective_area_total"] - flavor_sum) / area["effective_area_total"]).to_value(u.dimensionless_unscaled))
     max_relative_difference = float(np.max(relative_difference))
-
     require(max_relative_difference < 0.01, "Total effective area agrees with flavor sum within 1% published precision")
     require(u.allclose(area["energy"][15], 5.97e6 * u.GeV), "Published 5.97 PeV effective-area reference energy is reproduced")
     require(u.allclose(area["effective_area_total"][15], 512.0 * u.m**2), "Published 5.97 PeV total effective area is reproduced")
@@ -131,7 +184,6 @@ def plot_flux_results(limit, sensitivity, glashow):
     xerr = np.vstack((energy - energy_min, energy_max - energy))
     upper = np.asarray(glashow["is_upper_limit"], dtype=bool)
     measured = ~upper
-
     y = glashow["E2phi"].to_value(E2PHI_UNIT)
     y_lower = glashow["E2phi_lower"].to_value(E2PHI_UNIT)
     y_upper = glashow["E2phi_upper"].to_value(E2PHI_UNIT)
@@ -144,7 +196,6 @@ def plot_flux_results(limit, sensitivity, glashow):
     ax.set_ylabel(r"Flux, $E^{2}\Phi$ [GeV cm$^{-2}$ s$^{-1}$ sr$^{-1}$]")
     ax.set_title("IceCube Neutrino Flux Results")
     ax.grid(True, which="both", alpha=0.25)
-
     ax.text(0.97, 0.02, r"All flavors" "\n" r"$\nu_e:\nu_\mu:\nu_\tau=1:1:1$, $\nu:\bar{\nu}=1:1$", transform=ax.transAxes, ha="right", va="bottom", fontweight="bold")
 
     bold_tick_labels(ax)
@@ -160,7 +211,6 @@ def plot_combined_spectrum(combined):
     energy_min = combined["energy_min"].to_value(u.GeV)
     energy_max = combined["energy_max"].to_value(u.GeV)
     xerr = np.vstack((energy - energy_min, energy_max - energy))
-
     upper = np.asarray(combined["is_upper_limit"], dtype=bool)
     measured = ~upper
     y = combined["E2phi"].to_value(E2PHI_UNIT)
@@ -182,6 +232,7 @@ def plot_combined_spectrum(combined):
     ax.set_title("IceCube Combined Astrophysical Spectrum (2015)")
     ax.grid(True, which="both", alpha=0.25)
     ax.text(0.97, 0.03, r"All flavors" "\n" r"68% profile intervals", transform=ax.transAxes, ha="right", va="bottom", fontweight="bold")
+
     bold_tick_labels(ax)
     bold_legend(ax.legend(loc="upper right"))
     fig.tight_layout()
@@ -195,7 +246,6 @@ def plot_throughgoing_muon(piecewise):
     energy_min = piecewise["energy_min"].to_value(u.GeV)
     energy_max = piecewise["energy_max"].to_value(u.GeV)
     xerr = np.vstack((energy - energy_min, energy_max - energy))
-
     upper = np.asarray(piecewise["is_upper_limit"], dtype=bool)
     measured = ~upper
     y = piecewise["E2phi"].to_value(E2PHI_UNIT)
@@ -217,6 +267,7 @@ def plot_throughgoing_muon(piecewise):
     ax.set_title("IceCube 9.5-Year Through-Going Muon Flux")
     ax.grid(True, which="both", alpha=0.25)
     ax.text(0.97, 0.03, r"$\nu_\mu+\bar{\nu}_\mu$" "\n" r"68.27% measurements, 90% limits", transform=ax.transAxes, ha="right", va="bottom", fontweight="bold")
+
     bold_tick_labels(ax)
     bold_legend(ax.legend(loc="upper right"))
     fig.tight_layout()
@@ -225,11 +276,51 @@ def plot_throughgoing_muon(piecewise):
     plt.close(fig)
 
 
+def plot_ngc1068(ngc):
+    energy = ngc["energy"].to_value(u.GeV)
+    y = ngc["E2phi"].to_value(E2PHI_POINT_SOURCE_UNIT)
+
+    fig, ax = plt.subplots(figsize=(7, 5))
+    ax.loglog(energy, y, color="black", linewidth=2.2, label="NGC 1068")
+    ax.set_xlabel(r"Neutrino energy, $E_{\nu}$ [GeV]")
+    ax.set_ylabel(r"Flux, $E^{2}\Phi$ [GeV cm$^{-2}$ s$^{-1}$]")
+    ax.set_title("IceCube NGC 1068 Point-Source Flux")
+    ax.grid(True, which="both", alpha=0.25)
+    ax.text(0.04, 0.05, r"$\Phi_0=5.0\times10^{-11}$ TeV$^{-1}$ cm$^{-2}$ s$^{-1}$" "\n" r"$\gamma=3.2$" "\n" r"$E_0=1$ TeV" "\n" r"79$_{-20}^{+22}$ signal events, 4.2$\sigma$", transform=ax.transAxes, fontweight="bold")
+
+    bold_tick_labels(ax)
+    bold_legend(ax.legend(loc="upper right"))
+    fig.tight_layout()
+    fig.savefig(OUTPUT_DIR / "icecube_ngc1068_flux_2022.png", dpi=200)
+    fig.savefig(OUTPUT_DIR / "icecube_ngc1068_flux_2022.pdf")
+    plt.close(fig)
+
+
+def plot_txs0506(txs):
+    energy = txs["energy"].to_value(u.GeV)
+    y = txs["E2phi"].to_value(E2PHI_POINT_SOURCE_UNIT)
+
+    fig, ax = plt.subplots(figsize=(7, 5))
+    ax.loglog(energy, y, color="black", linewidth=2.2, label="TXS 0506+056")
+    ax.set_xlabel(r"Neutrino energy, $E_{\nu}$ [GeV]")
+    ax.set_ylabel(r"Flux, $E^{2}\Phi$ [GeV cm$^{-2}$ s$^{-1}$]")
+    ax.set_title("IceCube TXS 0506+056 2014-2015 Flare Flux")
+    ax.grid(True, which="both", alpha=0.25)
+    ax.text(0.04, 0.05, "158-day box flare" "\n" r"$\Phi_{100}=1.6\times10^{-15}$ TeV$^{-1}$ cm$^{-2}$ s$^{-1}$" "\n" r"$\gamma=2.2$" "\n" r"13$\pm5$ signal events, 3.5$\sigma$", transform=ax.transAxes, fontweight="bold")
+
+    bold_tick_labels(ax)
+    bold_legend(ax.legend(loc="upper right"))
+    fig.tight_layout()
+    fig.savefig(OUTPUT_DIR / "icecube_txs0506_flare_2018.png", dpi=200)
+    fig.savefig(OUTPUT_DIR / "icecube_txs0506_flare_2018.pdf")
+    plt.close(fig)
+
+
 def plot_effective_area(area):
     energy = area["energy"].to_value(u.GeV)
+
     fig, ax = plt.subplots(figsize=(7, 5))
     ax.set_xlim(8e5, 2e11)
-
     ax.loglog(energy, area["effective_area_total"].to_value(u.km**2), label="Total", linewidth=2)
     ax.loglog(energy, area["effective_area_nue"].to_value(u.km**2), label=r"$(\nu_e+\bar{\nu}_e)/2$")
     ax.loglog(energy, area["effective_area_numu"].to_value(u.km**2), label=r"$(\nu_\mu+\bar{\nu}_\mu)/2$")
@@ -250,7 +341,6 @@ def plot_effective_area(area):
 
 def main():
     OUTPUT_DIR.mkdir(exist_ok=True)
-
     print("IceCube scientific validation\n")
 
     limit = get_dataset("icecube.ehe.differential_limit.2025").load_e2phi()
@@ -261,6 +351,8 @@ def main():
     combined = get_dataset("icecube.combined_astrophysical_flux.2015").load_e2phi()
     piecewise = get_dataset("icecube.throughgoing_muon_piecewise_flux.2022").load_e2phi()
     piecewise_all = get_dataset("icecube.throughgoing_muon_piecewise_flux.2022").load_e2phi(flavor="all_flavor", flavor_assumption="equal")
+    ngc1068 = get_dataset("icecube.ngc1068_flux.2022").load_e2phi()
+    txs0506 = get_dataset("icecube.txs0506_flare_flux.2018").load_e2phi()
 
     print("EHE 2025 limit and sensitivity:")
     validate_ehe(limit, sensitivity)
@@ -274,14 +366,22 @@ def main():
     print("\nThrough-going muon spectrum 2022:")
     validate_throughgoing_muon(piecewise, piecewise_all)
 
+    print("\nNGC 1068 point-source flux 2022:")
+    validate_ngc1068(ngc1068)
+
+    print("\nTXS 0506+056 flare flux 2018:")
+    validate_txs0506(txs0506)
+
     print("\nEHE 2025 effective area:")
     validate_effective_area(area)
 
     print("\nGenerating validation figures...")
     plot_flux_results(limit, sensitivity, glashow_all)
-    plot_effective_area(area)
     plot_combined_spectrum(combined)
     plot_throughgoing_muon(piecewise)
+    plot_ngc1068(ngc1068)
+    plot_txs0506(txs0506)
+    plot_effective_area(area)
 
     print(f"[PASS] Validation figures written to {OUTPUT_DIR}")
     print("\nValidation passed.")
