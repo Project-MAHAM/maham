@@ -43,19 +43,21 @@ def load_datasets():
     quantity = normalize_spectral_quantity(PLOT_QUANTITY)
 
     auger = get_dataset("auger.combined_spectrum.2021").load(quantity=quantity)
+    ta = get_dataset("telescope_array.combined_spectrum.2023").load(quantity=quantity)
     glashow = get_dataset("icecube.glashow.flux.2021").load(quantity=quantity, flavor="all_flavor", flavor_assumption="equal")
     ehe_limit = get_dataset("icecube.ehe.differential_limit.2025").load(quantity=quantity)
     ehe_sensitivity = get_dataset("icecube.ehe.sensitivity.2025").load(quantity=quantity)
 
-    return auger, glashow, ehe_limit, ehe_sensitivity
+    return auger, ta, glashow, ehe_limit, ehe_sensitivity
 
 
-def validate_comparison(auger, glashow, ehe_limit, ehe_sensitivity):
+def validate_comparison(auger, ta, glashow, ehe_limit, ehe_sensitivity):
     quantity = normalize_spectral_quantity(PLOT_QUANTITY)
     unit = common_unit(quantity)
 
     for name, table in (
         ("Auger", auger),
+        ("Telescope Array", ta),
         ("IceCube Glashow", glashow),
         ("IceCube EHE limit", ehe_limit),
         ("IceCube EHE sensitivity", ehe_sensitivity),
@@ -64,10 +66,12 @@ def validate_comparison(auger, glashow, ehe_limit, ehe_sensitivity):
         table[quantity].to(unit)
         require(True, f"{name} is convertible to the common physical unit")
 
+    require(np.count_nonzero(ta["is_upper_limit"]) == 1, "Telescope Array contributes one upper limit")
+    require(bool(ta["is_upper_limit"][-1]), "Telescope Array upper limit is the final point")
     require(glashow.meta["flavor_convention"] == "all_flavor", "Glashow spectrum uses the all-flavor comparison convention")
 
 
-def plot_comparison(auger, glashow, ehe_limit, ehe_sensitivity):
+def plot_comparison(auger, ta, glashow, ehe_limit, ehe_sensitivity):
     quantity = normalize_spectral_quantity(PLOT_QUANTITY)
     unit = common_unit(quantity)
     _, power = spectral_quantity_info(quantity)
@@ -75,14 +79,38 @@ def plot_comparison(auger, glashow, ehe_limit, ehe_sensitivity):
     fig, ax = plt.subplots(figsize=(10, 5))
     ax.set_xscale("log")
     ax.set_yscale("log")
-    ax.set_xlim(2e6, 2e11)
+    ax.set_xlim(2e6, 4e11)
 
+    # Auger
     energy = auger["energy"].to_value(u.GeV)
     y = auger[quantity].to_value(unit)
     stat_lower = auger[f"{quantity}_stat_err_lower"].to_value(unit)
     stat_upper = auger[f"{quantity}_stat_err_upper"].to_value(unit)
     ax.errorbar(energy, y, yerr=np.vstack((stat_lower, stat_upper)), fmt="o", linestyle="none", markersize=5, markerfacecolor="white", markeredgewidth=1.2, elinewidth=1.2, capsize=2, label="Auger 2021")
 
+    # Telescope Array
+    energy = ta["energy"].to_value(u.GeV)
+    energy_min = ta["energy_min"].to_value(u.GeV)
+    energy_max = ta["energy_max"].to_value(u.GeV)
+    xerr = np.vstack((energy - energy_min, energy_max - energy))
+    upper = np.asarray(ta["is_upper_limit"], dtype=bool)
+    measured = ~upper
+    resolved = np.asarray(ta["has_resolved_vertical_error"], dtype=bool) & measured
+    unresolved = measured & ~resolved
+
+    y = ta[quantity].to_value(unit)
+    y_lower = ta[f"{quantity}_lower"].to_value(unit)
+    y_upper = ta[f"{quantity}_upper"].to_value(unit)
+
+    ta_yerr = np.vstack((y[resolved] - y_lower[resolved], y_upper[resolved] - y[resolved]))
+    ta_handle = ax.errorbar(energy[resolved], y[resolved], xerr=xerr[:, resolved], yerr=ta_yerr, fmt="D", linestyle="none", markersize=5, markerfacecolor="white", markeredgewidth=1.2, elinewidth=1.2, capsize=2, label="TA + TAx4 2023")
+    ta_color = ta_handle[0].get_color()
+
+    ax.errorbar(energy[unresolved], y[unresolved], xerr=xerr[:, unresolved], fmt="D", linestyle="none", markersize=5, markerfacecolor="white", markeredgewidth=1.2, elinewidth=1.2, capsize=2, color=ta_color)
+
+    plot_upper_limits(ax, energy[upper], y[upper], xerr=xerr[:, upper], arrow_factor=2.5, color=ta_color, linewidth=1.5, capsize=3, mutation_scale=12)
+
+    # IceCube EHE
     energy = ehe_limit["energy"].to_value(u.GeV)
     y = ehe_limit[quantity].to_value(unit)
     ax.plot(energy, y, marker="o", markerfacecolor="white", markeredgewidth=1.5, linewidth=2, markersize=6, label="IceCube EHE limit")
@@ -91,6 +119,7 @@ def plot_comparison(auger, glashow, ehe_limit, ehe_sensitivity):
     y = ehe_sensitivity[quantity].to_value(unit)
     ax.plot(energy, y, marker="s", markerfacecolor="white", markeredgewidth=1.5, linestyle="--", linewidth=2, markersize=5.5, label="IceCube EHE sensitivity")
 
+    # IceCube Glashow
     energy = glashow["energy"].to_value(u.GeV)
     energy_min = glashow["energy_min"].to_value(u.GeV)
     energy_max = glashow["energy_max"].to_value(u.GeV)
@@ -110,7 +139,8 @@ def plot_comparison(auger, glashow, ehe_limit, ehe_sensitivity):
     ax.set_ylabel(rf"Scaled differential intensity, {quantity_label(quantity)} [{UNIT_LABELS[power]}]")
     ax.set_title("Diffuse Spectrum Comparison")
     ax.grid(True, which="both", alpha=0.25)
-    ax.text(0.97, 0.02, r"All flavors neutrino" "\n" r"$\nu_e:\nu_\mu:\nu_\tau=1:1:1$, $\nu:\bar{\nu}=1:1$", transform=ax.transAxes, ha="right", va="bottom", fontweight="bold")
+
+    ax.text(0.97, 0.02, r"All flavors neutrino data" "\n" r"$\nu_e:\nu_\mu:\nu_\tau=1:1:1$, $\nu:\bar{\nu}=1:1$", transform=ax.transAxes, ha="right", va="bottom", fontweight="bold")
 
     bold_tick_labels(ax)
     bold_legend(ax.legend(loc="best"))
@@ -126,9 +156,9 @@ def main():
     apply_plot_style()
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    auger, glashow, ehe_limit, ehe_sensitivity = load_datasets()
-    validate_comparison(auger, glashow, ehe_limit, ehe_sensitivity)
-    plot_comparison(auger, glashow, ehe_limit, ehe_sensitivity)
+    auger, ta, glashow, ehe_limit, ehe_sensitivity = load_datasets()
+    validate_comparison(auger, ta, glashow, ehe_limit, ehe_sensitivity)
+    plot_comparison(auger, ta, glashow, ehe_limit, ehe_sensitivity)
 
     print(f"Comparison outputs written to {OUTPUT_DIR}")
 

@@ -10,6 +10,7 @@ class ProvenanceType(str, Enum):
     AUTHOR_PROVIDED = "author_provided"
     DIGITIZED = "digitized"
     DERIVED = "derived"
+    CURATED_DATABASE = "curated_database"
 
 
 class StorageMode(str, Enum):

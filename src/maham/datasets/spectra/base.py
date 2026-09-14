@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from pathlib import Path
 
 from astropy.table import QTable, Table
 
@@ -17,8 +18,8 @@ class SpectrumDataset(Dataset):
     def standardize(self, raw: Table) -> QTable:
         pass
 
-    def load(self, quantity: str | None = None, cache: bool = True, show_progress: bool = True) -> QTable:
-        raw = self.load_raw(cache=cache, show_progress=show_progress)
+    def load(self, quantity: str | None = None, cache: bool = True, show_progress: bool = True, path: str | Path | None = None) -> QTable:
+        raw = self.load_raw(cache=cache, show_progress=show_progress) if path is None else self.load_raw(path=path, cache=cache, show_progress=show_progress)
         table = self.standardize(raw)
         native_quantity = self._native_quantity()
         table.meta["native_quantity"] = native_quantity

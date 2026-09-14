@@ -145,60 +145,71 @@ The following structure describes the intended organization of MAHAM. Not every 
 
 ```text
 maham/
+│
 ├── src/
 │   └── maham/
 │       ├── __init__.py
 │       ├── citations.py
+│       │
 │       ├── _core/
 │       │   ├── __init__.py
 │       │   ├── metadata.py
 │       │   ├── units.py
 │       │   └── typing.py
+│       │
 │       ├── physics/
 │       │   ├── __init__.py
 │       │   ├── particles.py
 │       │   ├── kinematics.py
 │       │   ├── interactions.py
 │       │   └── propagation.py
+│       │
 │       ├── spectra/
 │       │   ├── __init__.py
 │       │   ├── conversions.py
 │       │   ├── flavor.py
 │       │   ├── integration.py
 │       │   └── weighting.py
+│       │
 │       ├── statistics/
 │       │   ├── __init__.py
 │       │   ├── counting.py
 │       │   ├── intervals.py
 │       │   ├── likelihood.py
 │       │   └── hypothesis.py
+│       │
 │       ├── detector/
 │       │   ├── __init__.py
 │       │   ├── response.py
 │       │   ├── exposure.py
 │       │   ├── rates.py
 │       │   └── sensitivity.py
+│       │
 │       ├── astronomy/
 │       │   ├── __init__.py
 │       │   ├── coordinates.py
 │       │   ├── time.py
 │       │   ├── visibility.py
 │       │   └── skymap.py
+│       │
 │       ├── multimessenger/
 │       │   ├── __init__.py
 │       │   ├── coincidence.py
 │       │   ├── association.py
 │       │   └── transients.py
+│       │
 │       ├── radio/
 │       │   ├── __init__.py
 │       │   ├── antenna.py
 │       │   ├── transmission.py
 │       │   ├── polarization.py
 │       │   └── noise.py
+│       │
 │       ├── models/
 │       │   ├── __init__.py
 │       │   ├── base.py
 │       │   ├── registry.py
+│       │   │
 │       │   ├── flux/
 │       │   │   ├── __init__.py
 │       │   │   ├── neutrino/
@@ -207,33 +218,45 @@ maham/
 │       │   │   │   └── __init__.py
 │       │   │   └── gamma_ray/
 │       │   │       └── __init__.py
+│       │   │
 │       │   ├── cross_sections/
 │       │   │   └── __init__.py
+│       │   │
 │       │   ├── sources/
 │       │   │   └── __init__.py
+│       │   │
 │       │   ├── attenuation/
 │       │   │   └── __init__.py
+│       │   │
 │       │   ├── backgrounds/
 │       │   │   └── __init__.py
+│       │   │
 │       │   └── populations/
 │       │       └── __init__.py
+│       │
 │       ├── datasets/
 │       │   ├── __init__.py
 │       │   ├── base.py
 │       │   ├── registry.py
+│       │   │
 │       │   ├── spectra/
 │       │   │   ├── __init__.py
 │       │   │   ├── base.py
+│       │   │   │
 │       │   │   ├── neutrino/
 │       │   │   │   ├── __init__.py
 │       │   │   │   ├── base.py
 │       │   │   │   └── icecube_glashow_2021.py
+│       │   │   │
 │       │   │   ├── cosmic_ray/
 │       │   │   │   ├── __init__.py
 │       │   │   │   ├── base.py
-│       │   │   │   └── auger_spectrum_2021.py
+│       │   │   │   ├── auger_spectrum_2021.py
+│       │   │   │   └── telescope_array_combined_2023.py
+│       │   │   │
 │       │   │   └── gamma_ray/
 │       │   │       └── __init__.py
+│       │   │
 │       │   ├── limits/
 │       │   │   ├── __init__.py
 │       │   │   ├── neutrino/
@@ -243,6 +266,7 @@ maham/
 │       │   │   │   └── __init__.py
 │       │   │   └── gamma_ray/
 │       │   │       └── __init__.py
+│       │   │
 │       │   ├── sensitivities/
 │       │   │   ├── __init__.py
 │       │   │   ├── neutrino/
@@ -252,6 +276,7 @@ maham/
 │       │   │   │   └── __init__.py
 │       │   │   └── gamma_ray/
 │       │   │       └── __init__.py
+│       │   │
 │       │   ├── effective_area/
 │       │   │   ├── __init__.py
 │       │   │   ├── base.py
@@ -262,10 +287,13 @@ maham/
 │       │   │   │   └── __init__.py
 │       │   │   └── gamma_ray/
 │       │   │       └── __init__.py
+│       │   │
 │       │   └── events/
 │       │       └── __init__.py
+│       │
 │       ├── data/
 │       │   ├── __init__.py
+│       │   │
 │       │   ├── models/
 │       │   │   ├── README.md
 │       │   │   ├── flux/
@@ -277,30 +305,39 @@ maham/
 │       │   │   ├── attenuation/
 │       │   │   ├── backgrounds/
 │       │   │   └── populations/
+│       │   │
 │       │   └── datasets/
 │       │       ├── README.md
+│       │       │
 │       │       ├── spectra/
 │       │       │   ├── neutrino/
 │       │       │   ├── cosmic_ray/
+│       │       │   │   └── telescope_array_combined_2023_digitized.csv
 │       │       │   └── gamma_ray/
+│       │       │
 │       │       ├── limits/
 │       │       │   ├── neutrino/
 │       │       │   ├── cosmic_ray/
 │       │       │   └── gamma_ray/
+│       │       │
 │       │       ├── sensitivities/
 │       │       │   ├── neutrino/
 │       │       │   ├── cosmic_ray/
 │       │       │   └── gamma_ray/
+│       │       │
 │       │       ├── effective_area/
 │       │       │   ├── neutrino/
 │       │       │   ├── cosmic_ray/
 │       │       │   └── gamma_ray/
+│       │       │
 │       │       └── events/
+│       │
 │       ├── integrations/
 │       │   ├── __init__.py
 │       │   ├── nuradio.py
 │       │   ├── root.py
 │       │   └── healpy.py
+│       │
 │       └── plotting/
 │           ├── __init__.py
 │           ├── style.py
@@ -308,42 +345,65 @@ maham/
 │           ├── limits.py
 │           ├── detector.py
 │           └── sky.py
+│
 ├── tests/
 │   ├── physics/
+│   │
 │   ├── spectra/
 │   │   ├── test_conversions.py
 │   │   └── test_flavor.py
+│   │
 │   ├── statistics/
+│   │
 │   ├── detector/
+│   │
 │   ├── astronomy/
+│   │
 │   ├── multimessenger/
+│   │
 │   ├── radio/
+│   │
 │   ├── models/
+│   │
 │   ├── datasets/
-│   │   ├── test_auger_spectrum_2021.py
 │   │   ├── test_icecube_glashow.py
-│   │   └── test_icecube_ehe_2025.py
+│   │   ├── test_icecube_ehe_2025.py
+│   │   ├── test_auger_spectrum_2021.py
+│   │   └── test_telescope_array_combined_2023.py
+│   │
 │   ├── integrations/
+│   │
 │   └── plotting/
+│
 ├── validation/
 │   ├── README.md
+│   │
 │   ├── published_results/
 │   │   ├── icecube/
 │   │   │   ├── README.md
 │   │   │   ├── validate.py
 │   │   │   └── outputs/
 │   │   │       └── .gitignore
-│   │   └── auger/
+│   │   │
+│   │   ├── auger/
+│   │   │   ├── README.md
+│   │   │   ├── validate.py
+│   │   │   └── outputs/
+│   │   │       └── .gitignore
+│   │   │
+│   │   └── telescope_array/
 │   │       ├── README.md
 │   │       ├── validate.py
 │   │       └── outputs/
 │   │           └── .gitignore
+│   │
 │   └── comparisons/
 │       └── diffuse_spectra/
 │           ├── README.md
 │           ├── compare.py
 │           └── outputs/
 │               └── .gitignore
+│
 ├── examples/
 │   ├── physics/
 │   ├── spectra/
@@ -354,8 +414,10 @@ maham/
 │   ├── radio/
 │   ├── models/
 │   └── datasets/
+│
 ├── benchmarks/
 │   └── README.md
+│
 ├── docs/
 │   ├── architecture.md
 │   ├── getting_started/
@@ -364,10 +426,12 @@ maham/
 │   ├── datasets/
 │   ├── validation/
 │   └── api/
+│
 ├── .github/
 │   ├── workflows/
 │   ├── ISSUE_TEMPLATE/
 │   └── PULL_REQUEST_TEMPLATE.md
+│
 ├── pyproject.toml
 ├── CITATION.cff
 ├── CONTRIBUTING.md
@@ -377,6 +441,7 @@ maham/
 ├── README.md
 ├── LICENSE
 └── .gitignore
+
 ```
 
 The tree above describes the intended organization of MAHAM. It defines where future functionality belongs but does not imply that every planned module is already implemented.

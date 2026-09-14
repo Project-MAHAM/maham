@@ -1,12 +1,13 @@
-# Diffuse Spectrum Comparison
+## Current datasets
 
-This validation compares supported diffuse particle spectra and flux constraints using a common MAHAM spectral representation.
+The comparison currently includes:
 
-Experiment-specific validation remains responsible for reproducing each release in its native convention. This comparison instead tests MAHAM's cross-dataset spectral conversions.
+- Pierre Auger Observatory 2021 combined cosmic-ray spectrum;
+- Telescope Array 2023 combined TA SD + TAx4 SD cosmic-ray spectrum;
+- IceCube 2021 Glashow-resonance flux measurement and upper limits;
+- IceCube 2025 EHE differential limit;
+- IceCube 2025 EHE sensitivity.
 
-## Supported representations
+The Telescope Array dataset is an independent Project MAHAM digitization of the published combined spectrum and includes its final upper-limit point.
 
-The comparison quantity is selected in `compare.py` with:
-
-```python
-PLOT_QUANTITY = "E2phi"
+Neutrino results are displayed using the all-flavor comparison convention.
