@@ -54,7 +54,7 @@ class NeutrinoSpectrumDataset(SpectrumDataset):
             return result
 
         quantity = result.meta["quantity"]
-        for suffix in ("", "_lower", "_upper", "_stat_err_lower", "_stat_err_upper", "_sys_err_lower", "_sys_err_upper"):
+        for suffix in ("", "_lower", "_upper", "_90_lower", "_90_upper", "_2sigma_lower", "_2sigma_upper", "_3sigma_lower", "_3sigma_upper", "_stat_err_lower", "_stat_err_upper", "_sys_err_lower", "_sys_err_upper",):
             column = f"{quantity}{suffix}"
             if column in result.colnames:
                 result[column] = convert_flavor_convention(result[column], source, target, flavor_assumption)

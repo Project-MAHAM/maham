@@ -25,3 +25,19 @@ def test_flavor_conversion_requires_assumption():
 def test_same_flavor_requires_no_assumption():
     value = 2e-8 * u.GeV / (u.cm**2 * u.s * u.sr)
     assert u.allclose(convert_flavor_convention(value, "per_flavor", "per_flavor"), value)
+
+def test_numu_nubar_to_all_flavor_equal():
+    value = 2.0 * u.GeV
+    result = convert_flavor_convention(value, "numu_nubar", "all_flavor", assumption="equal")
+    assert u.allclose(result, 6.0 * u.GeV)
+
+
+def test_numu_nubar_to_per_flavor_equal():
+    value = 2.0 * u.GeV
+    result = convert_flavor_convention(value, "numu_nubar", "per_flavor", assumption="equal")
+    assert u.allclose(result, value)
+
+
+def test_numu_nubar_conversion_requires_assumption():
+    with pytest.raises(ValueError):
+        convert_flavor_convention(2.0 * u.GeV, "numu_nubar", "all_flavor")
