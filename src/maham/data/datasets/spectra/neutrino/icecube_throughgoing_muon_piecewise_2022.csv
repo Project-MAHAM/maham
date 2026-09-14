@@ -1,0 +1,6 @@
+energy_min_GeV,energy_max_GeV,phi_piece_Cunits,phi_piece_lower_Cunits,phi_piece_upper_Cunits,confidence_level,is_upper_limit
+100,15000,0.0,0.0,3.1,0.90,True
+15000,104000,2.22,1.42,3.02,0.6827,False
+104000,721000,1.21,0.90,1.53,0.6827,False
+721000,5000000,0.33,0.15,0.55,0.6827,False
+5000000,100000000,0.0,0.0,0.41,0.90,True

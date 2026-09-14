@@ -1,155 +1,9 @@
-# MAHAM Architecture
-
-MAHAM is organized around scientific concepts rather than experiments or individual messengers.
-
-The project separates scientific content into three principal categories:
-
-## Methods
-
-Methods are general equations, algorithms, and scientific operations.
-
-Examples include:
-
-- kinematic calculations
-- spectral transformations
-- statistical intervals and hypothesis tests
-- exposure and event-rate calculations
-- astronomical coordinate calculations
-- coincidence and association methods
-- detector-response calculations
-
-Methods should not depend on a particular experiment or published physical model.
-
-## Models
-
-Models are specific theoretical or phenomenological prescriptions.
-
-Examples include:
-
-- neutrino, cosmic-ray, and gamma-ray flux models
-- interaction cross-section models
-- source spectra
-- attenuation models
-- background models
-- source-population models
-
-Models may be analytical, numerical, or tabulated.
-
-Each model should preserve its scientific provenance, including its reference, parameters, assumptions, units, conventions, and validity range.
-
-## Datasets
-
-Datasets are published experimental or observational results.
-
-Examples include:
-
-- measured spectra
-- flux measurements
-- upper limits
-- experimental sensitivities
-- published effective areas and other detector-response products
-- selected event measurements
-
-Each dataset should preserve its source, reference, units, conventions, confidence level where applicable, and provenance.
-
-Official machine-readable data should be preferred over digitized data whenever available.
-
-Published detector-response products such as effective areas belong under `datasets/` because they are experiment-specific published results. General calculations involving detector response belong under `detector/`.
-
-A single official release may contain several scientifically distinct products. These should be exposed as separate MAHAM datasets when their scientific meanings differ. For example, an observed upper limit, expected sensitivity, and effective area may come from the same release while remaining separate MAHAM dataset objects.
-
-## Dataset interface conventions
-
-Dataset interfaces separate the source representation from the standardized MAHAM representation.
-
-`load_raw()` returns the published source data as close as practical to the authoritative representation.
-
-`load()` returns a standardized MAHAM representation with explicit units, metadata, conventions, and scientifically meaningful column names.
-
-Spectrum datasets may additionally provide standardized representations such as:
-
-- `load_phi()`
-- `load_ephi()`
-- `load_e2phi()`
-
-or equivalently:
-
-- `load(quantity="phi")`
-- `load(quantity="Ephi")`
-- `load(quantity="E2phi")`
-
-These representations are derived on demand rather than stored as duplicate copies of the same scientific result.
-
-Upper-limit datasets should explicitly identify upper-limit values, for example through an `is_upper_limit` column when appropriate.
-
-## Scientific data files
-
-Small redistributable numerical tables required by MAHAM are stored under `src/maham/data/` and distributed with the package.
-
-The Python interfaces to those files remain under `models/` or `datasets/`.
-
-Large datasets or data that should remain at their authoritative source may be retrieved externally and cached rather than stored in the MAHAM repository.
-
-MAHAM should not become a general-purpose scientific data warehouse. Remote authoritative releases should remain at their official source whenever practical.
-
-## Remote data integrity
-
-Remote scientific data should be verified whenever a stable integrity reference is available.
-
-For ordinary static files, MAHAM may verify the checksum of the downloaded file.
-
-For dynamically generated archives, such as archives assembled by external data repositories at request time, the archive checksum itself may not be stable. In those cases MAHAM should verify the checksum and, where useful, the byte size of the specific scientific file contained inside the archive.
-
-Integrity verification should protect the scientific source content without assuming that transport containers or archive metadata remain byte-for-byte identical indefinitely.
-
-## Validation
-
-Software testing and scientific validation have different purposes.
-
-`tests/` asks:
-
-> Does the software behave as implemented?
-
-`validation/` asks:
-
-> Does the implementation reproduce the expected physics or published result?
-
-Scientific validation may reproduce analytical results, tables, benchmark calculations, or published figures.
-
-## Integrations
-
-Integrations are adapters to external software and data formats.
-
-They should contain no new scientific physics.
-
-Examples may include interfaces to NuRadioMC/NuRadioReco, ROOT, and HEALPix software.
-
-## Core architectural rules
-
-1. Organize scientific functionality by concept, not by experiment.
-2. General calculations belong in scientific method modules.
-3. Specific theoretical or phenomenological prescriptions belong in `models/`.
-4. Published measurements, limits, sensitivities, effective areas, and other published detector-response products belong in `datasets/`.
-5. Experiment-specific adapters belong in `integrations/`, not in the scientific core.
-6. General detector-response calculations belong in `detector/`; published detector-response tables belong in `datasets/`.
-7. Do not duplicate functionality already provided well by established scientific packages without a clear scientific reason.
-8. Avoid generic dumping-ground modules such as `utils.py`, `helpers.py`, and `misc.py`.
-9. Tests verify software behavior; validation verifies scientific correctness.
-10. Data provenance, units, conventions, assumptions, and citations are part of the scientific result and must not be hidden in plotting or analysis code.
-11. Distinct scientific products from the same published release should remain distinct dataset interfaces even when they share one source file or archive.
-12. New top-level modules should be introduced only when the functionality cannot naturally belong to an existing scientific concept.
-
-## Planned package structure
-
-The following structure describes the intended organization of MAHAM. Not every module is expected to contain implemented functionality during the early stages of development.
-
-```text
-maham/
+MAHAM/
 │
 ├── src/
 │   └── maham/
+│       │
 │       ├── __init__.py
-│       ├── citations.py
 │       │
 │       ├── _core/
 │       │   ├── __init__.py
@@ -159,51 +13,73 @@ maham/
 │       │
 │       ├── physics/
 │       │   ├── __init__.py
-│       │   ├── particles.py
-│       │   ├── kinematics.py
-│       │   ├── interactions.py
-│       │   └── propagation.py
+│       │   ├── particles/
+│       │   │   └── __init__.py
+│       │   ├── kinematics/
+│       │   │   └── __init__.py
+│       │   ├── interactions/
+│       │   │   └── __init__.py
+│       │   └── propagation/
+│       │       └── __init__.py
 │       │
 │       ├── spectra/
 │       │   ├── __init__.py
 │       │   ├── conversions.py
 │       │   ├── flavor.py
-│       │   ├── integration.py
 │       │   └── weighting.py
 │       │
 │       ├── statistics/
 │       │   ├── __init__.py
-│       │   ├── counting.py
-│       │   ├── intervals.py
-│       │   ├── likelihood.py
-│       │   └── hypothesis.py
+│       │   ├── counting/
+│       │   │   └── __init__.py
+│       │   ├── intervals/
+│       │   │   └── __init__.py
+│       │   ├── likelihood/
+│       │   │   └── __init__.py
+│       │   └── hypothesis/
+│       │       └── __init__.py
 │       │
 │       ├── detector/
 │       │   ├── __init__.py
-│       │   ├── response.py
-│       │   ├── exposure.py
-│       │   ├── rates.py
-│       │   └── sensitivity.py
+│       │   ├── response/
+│       │   │   └── __init__.py
+│       │   ├── exposure/
+│       │   │   └── __init__.py
+│       │   ├── rates/
+│       │   │   └── __init__.py
+│       │   └── sensitivity/
+│       │       └── __init__.py
 │       │
 │       ├── astronomy/
 │       │   ├── __init__.py
-│       │   ├── coordinates.py
-│       │   ├── time.py
-│       │   ├── visibility.py
-│       │   └── skymap.py
+│       │   ├── coordinates/
+│       │   │   └── __init__.py
+│       │   ├── time/
+│       │   │   └── __init__.py
+│       │   ├── visibility/
+│       │   │   └── __init__.py
+│       │   └── skymap/
+│       │       └── __init__.py
 │       │
 │       ├── multimessenger/
 │       │   ├── __init__.py
-│       │   ├── coincidence.py
-│       │   ├── association.py
-│       │   └── transients.py
+│       │   ├── coincidence/
+│       │   │   └── __init__.py
+│       │   ├── association/
+│       │   │   └── __init__.py
+│       │   └── transients/
+│       │       └── __init__.py
 │       │
 │       ├── radio/
 │       │   ├── __init__.py
-│       │   ├── antenna.py
-│       │   ├── transmission.py
-│       │   ├── polarization.py
-│       │   └── noise.py
+│       │   ├── antenna/
+│       │   │   └── __init__.py
+│       │   ├── transmission/
+│       │   │   └── __init__.py
+│       │   ├── polarization/
+│       │   │   └── __init__.py
+│       │   └── noise/
+│       │       └── __init__.py
 │       │
 │       ├── models/
 │       │   ├── __init__.py
@@ -221,16 +97,12 @@ maham/
 │       │   │
 │       │   ├── cross_sections/
 │       │   │   └── __init__.py
-│       │   │
 │       │   ├── sources/
 │       │   │   └── __init__.py
-│       │   │
 │       │   ├── attenuation/
 │       │   │   └── __init__.py
-│       │   │
 │       │   ├── backgrounds/
 │       │   │   └── __init__.py
-│       │   │
 │       │   └── populations/
 │       │       └── __init__.py
 │       │
@@ -246,56 +118,46 @@ maham/
 │       │   │   ├── neutrino/
 │       │   │   │   ├── __init__.py
 │       │   │   │   ├── base.py
-│       │   │   │   └── icecube_glashow_2021.py
+│       │   │   │   ├── icecube_glashow_2021.py
+│       │   │   │   ├── icecube_ehe_2025.py
+│       │   │   │   ├── icecube_combined_2015.py
+│       │   │   │   ├── icecube_throughgoing_muon_2022.py
+│       │   │   │   └── km3net_230213a_flux_2025.py
 │       │   │   │
 │       │   │   ├── cosmic_ray/
 │       │   │   │   ├── __init__.py
 │       │   │   │   ├── base.py
-│       │   │   │   ├── auger_spectrum_2021.py
+│       │   │   │   ├── auger_combined_2021.py
 │       │   │   │   └── telescope_array_combined_2023.py
 │       │   │   │
 │       │   │   └── gamma_ray/
-│       │   │       └── __init__.py
+│       │   │       ├── __init__.py
+│       │   │       ├── base.py
+│       │   │       └── fermi_lat_igrb_egb_2015.py
 │       │   │
 │       │   ├── limits/
-│       │   │   ├── __init__.py
-│       │   │   ├── neutrino/
-│       │   │   │   ├── __init__.py
-│       │   │   │   └── icecube_ehe_2025.py
-│       │   │   ├── cosmic_ray/
-│       │   │   │   └── __init__.py
-│       │   │   └── gamma_ray/
-│       │   │       └── __init__.py
+│       │   │   └── __init__.py
 │       │   │
 │       │   ├── sensitivities/
-│       │   │   ├── __init__.py
-│       │   │   ├── neutrino/
-│       │   │   │   ├── __init__.py
-│       │   │   │   └── icecube_ehe_2025.py
-│       │   │   ├── cosmic_ray/
-│       │   │   │   └── __init__.py
-│       │   │   └── gamma_ray/
-│       │   │       └── __init__.py
+│       │   │   └── __init__.py
 │       │   │
 │       │   ├── effective_area/
 │       │   │   ├── __init__.py
 │       │   │   ├── base.py
-│       │   │   ├── neutrino/
-│       │   │   │   ├── __init__.py
-│       │   │   │   └── icecube_ehe_2025.py
-│       │   │   ├── cosmic_ray/
-│       │   │   │   └── __init__.py
-│       │   │   └── gamma_ray/
-│       │   │       └── __init__.py
+│       │   │   └── neutrino/
+│       │   │       ├── __init__.py
+│       │   │       ├── icecube_ehe_2025.py
+│       │   │       └── km3net_230213a_2025.py
 │       │   │
 │       │   └── events/
-│       │       └── __init__.py
+│       │       ├── __init__.py
+│       │       └── neutrino/
+│       │           ├── __init__.py
+│       │           └── km3net_230213a_2025.py
 │       │
 │       ├── data/
-│       │   ├── __init__.py
 │       │   │
 │       │   ├── models/
-│       │   │   ├── README.md
 │       │   │   ├── flux/
 │       │   │   │   ├── neutrino/
 │       │   │   │   ├── cosmic_ray/
@@ -307,36 +169,30 @@ maham/
 │       │   │   └── populations/
 │       │   │
 │       │   └── datasets/
-│       │       ├── README.md
-│       │       │
 │       │       ├── spectra/
 │       │       │   ├── neutrino/
+│       │       │   │   └── icecube_throughgoing_muon_piecewise_2022.csv
 │       │       │   ├── cosmic_ray/
 │       │       │   │   └── telescope_array_combined_2023_digitized.csv
 │       │       │   └── gamma_ray/
 │       │       │
 │       │       ├── limits/
-│       │       │   ├── neutrino/
-│       │       │   ├── cosmic_ray/
-│       │       │   └── gamma_ray/
-│       │       │
 │       │       ├── sensitivities/
-│       │       │   ├── neutrino/
-│       │       │   ├── cosmic_ray/
-│       │       │   └── gamma_ray/
 │       │       │
 │       │       ├── effective_area/
-│       │       │   ├── neutrino/
-│       │       │   ├── cosmic_ray/
-│       │       │   └── gamma_ray/
+│       │       │   └── neutrino/
 │       │       │
 │       │       └── events/
+│       │           └── neutrino/
 │       │
 │       ├── integrations/
 │       │   ├── __init__.py
-│       │   ├── nuradio.py
-│       │   ├── root.py
-│       │   └── healpy.py
+│       │   ├── nuradio/
+│       │   │   └── __init__.py
+│       │   ├── root/
+│       │   │   └── __init__.py
+│       │   └── healpy/
+│       │       └── __init__.py
 │       │
 │       └── plotting/
 │           ├── __init__.py
@@ -347,38 +203,96 @@ maham/
 │           └── sky.py
 │
 ├── tests/
+│   ├── __init__.py
+│   │
+│   ├── core/
+│   │   ├── test_metadata.py
+│   │   └── test_units.py
+│   │
 │   ├── physics/
+│   │   ├── particles/
+│   │   ├── kinematics/
+│   │   ├── interactions/
+│   │   └── propagation/
 │   │
 │   ├── spectra/
 │   │   ├── test_conversions.py
-│   │   └── test_flavor.py
+│   │   ├── test_flavor.py
+│   │   └── test_weighting.py
 │   │
 │   ├── statistics/
+│   │   ├── counting/
+│   │   ├── intervals/
+│   │   ├── likelihood/
+│   │   └── hypothesis/
 │   │
 │   ├── detector/
+│   │   ├── response/
+│   │   ├── exposure/
+│   │   ├── rates/
+│   │   └── sensitivity/
 │   │
 │   ├── astronomy/
+│   │   ├── coordinates/
+│   │   ├── time/
+│   │   ├── visibility/
+│   │   └── skymap/
 │   │
 │   ├── multimessenger/
+│   │   ├── coincidence/
+│   │   ├── association/
+│   │   └── transients/
 │   │
 │   ├── radio/
+│   │   ├── antenna/
+│   │   ├── transmission/
+│   │   ├── polarization/
+│   │   └── noise/
 │   │
 │   ├── models/
+│   │   ├── test_base.py
+│   │   ├── test_registry.py
+│   │   ├── flux/
+│   │   │   ├── neutrino/
+│   │   │   ├── cosmic_ray/
+│   │   │   └── gamma_ray/
+│   │   ├── cross_sections/
+│   │   ├── sources/
+│   │   ├── attenuation/
+│   │   ├── backgrounds/
+│   │   └── populations/
 │   │
 │   ├── datasets/
+│   │   ├── test_base.py
+│   │   ├── test_registry.py
 │   │   ├── test_icecube_glashow.py
 │   │   ├── test_icecube_ehe_2025.py
-│   │   ├── test_auger_spectrum_2021.py
-│   │   └── test_telescope_array_combined_2023.py
+│   │   ├── test_icecube_combined_2015.py
+│   │   ├── test_icecube_throughgoing_muon_2022.py
+│   │   ├── test_auger_combined_2021.py
+│   │   ├── test_telescope_array_combined_2023.py
+│   │   ├── test_fermi_lat_igrb_egb_2015.py
+│   │   ├── test_km3net_230213a_2025.py
+│   │   ├── test_km3net_230213a_flux_2025.py
+│   │   └── test_km3net_230213a_effective_area_2025.py
 │   │
 │   ├── integrations/
+│   │   ├── nuradio/
+│   │   ├── root/
+│   │   └── healpy/
 │   │
 │   └── plotting/
+│       ├── test_style.py
+│       ├── test_spectra.py
+│       ├── test_limits.py
+│       ├── test_detector.py
+│       └── test_sky.py
 │
 ├── validation/
 │   ├── README.md
 │   │
 │   ├── published_results/
+│   │   │
 │   │   ├── icecube/
 │   │   │   ├── README.md
 │   │   │   ├── validate.py
@@ -391,7 +305,19 @@ maham/
 │   │   │   └── outputs/
 │   │   │       └── .gitignore
 │   │   │
-│   │   └── telescope_array/
+│   │   ├── telescope_array/
+│   │   │   ├── README.md
+│   │   │   ├── validate.py
+│   │   │   └── outputs/
+│   │   │       └── .gitignore
+│   │   │
+│   │   ├── fermi_lat/
+│   │   │   ├── README.md
+│   │   │   ├── validate.py
+│   │   │   └── outputs/
+│   │   │       └── .gitignore
+│   │   │
+│   │   └── km3net/
 │   │       ├── README.md
 │   │       ├── validate.py
 │   │       └── outputs/
@@ -405,6 +331,7 @@ maham/
 │               └── .gitignore
 │
 ├── examples/
+│   ├── README.md
 │   ├── physics/
 │   ├── spectra/
 │   ├── statistics/
@@ -420,16 +347,39 @@ maham/
 │
 ├── docs/
 │   ├── architecture.md
+│   │
 │   ├── getting_started/
+│   │   ├── installation.md
+│   │   └── quickstart.md
+│   │
 │   ├── user_guide/
+│   │   ├── spectra.md
+│   │   ├── datasets.md
+│   │   ├── models.md
+│   │   ├── detector.md
+│   │   ├── astronomy.md
+│   │   ├── multimessenger.md
+│   │   └── radio.md
+│   │
 │   ├── models/
+│   │   └── README.md
+│   │
 │   ├── datasets/
+│   │   └── README.md
+│   │
 │   ├── validation/
+│   │   └── README.md
+│   │
 │   └── api/
+│       └── README.md
 │
 ├── .github/
 │   ├── workflows/
+│   │   ├── tests.yml
+│   │   └── lint.yml
+│   │
 │   ├── ISSUE_TEMPLATE/
+│   │
 │   └── PULL_REQUEST_TEMPLATE.md
 │
 ├── pyproject.toml
@@ -442,64 +392,114 @@ maham/
 ├── LICENSE
 └── .gitignore
 
-```
 
-The tree above describes the intended organization of MAHAM. It defines where future functionality belongs but does not imply that every planned module is already implemented.
+## Architecture principles
 
-Python modules contain scientific interfaces, calculations, and metadata logic.
+MAHAM is organized by scientific concept rather than by experiment.
 
-Numerical tables distributed with MAHAM are stored separately under `src/maham/data/`.
+- Methods define how calculations are performed.
+- Models represent named theoretical or phenomenological descriptions.
+- Datasets represent published measurements, limits, sensitivities, observations, detector-response products, and other scientific releases.
+- Validation reproduces published scientific results using MAHAM's public interfaces.
+- Integrations provide adapters to external ecosystems without introducing new physics.
+- Runtime package data are stored under `src/maham/data/`.
+- Tests verify software behavior; validation verifies scientific reproduction.
+- Published detector-response tables belong under `datasets/`; detector calculations belong under `detector/`.
+- MAHAM does not define an experiment-specific event format.
+- MAHAM does not silently convert neutrino flavor conventions. Physical assumptions required for a conversion must be explicit.
+- Generic scientific concepts should not be placed in experiment-specific top-level namespaces.
+- `utils` and `helpers` catch-all modules are avoided. Functionality belongs in the scientific concept that owns it.
 
-The same conceptual hierarchy is used for code and data where practical so that the relationship between an implementation and its associated numerical data remains clear.
 
-## Scientific naming conventions
+## Dataset provenance
 
-MAHAM uses plain ASCII notation for scientific quantity names in code, documentation, metadata, and text labels where practical.
+Every scientific dataset records how the values entered MAHAM.
+
+Supported provenance classes include:
+
+- `OFFICIAL_RELEASE`
+- `OFFICIAL_REPOSITORY`
+- `HEPDATA`
+- `ZENODO`
+- `AUTHOR_PROVIDED`
+- `CURATED_DATABASE`
+- `PUBLISHED_TABLE`
+- `DIGITIZED`
+- `DERIVED`
+
+`PUBLISHED_TABLE` is used when numerical values are transcribed directly from a published table.
+
+`DIGITIZED` is reserved for values reconstructed from figures or other graphical material.
+
+`DERIVED` is used when MAHAM computes a dataset from another scientific source rather than reproducing directly released values.
+
+
+## Dataset storage
+
+MAHAM supports three storage modes.
+
+### BUNDLED
+
+Small curated, transcribed, or digitized data distributed with the package.
+
+Examples:
+
+- IceCube 9.5-year through-going muon piece-wise flux
+- Telescope Array combined-spectrum digitization
+
+### REMOTE
+
+Authoritative public data downloaded on demand and cached locally. Integrity is checked using pinned checksums where available.
 
 Examples include:
 
-- `E2phi` for energy-squared weighted flux
-- `Ephi` for energy-weighted flux
-- `phi` for differential flux
-- `nu` for neutrino
-- `nubar` for antineutrino
-- `nue` for electron neutrino
-- `numu` for muon neutrino
-- `nutau` for tau neutrino
+- IceCube releases
+- KM3NeT KM3-230213A release
+- Fermi-LAT VizieR data
+- Auger supplementary data
 
-Unicode mathematical symbols are not required to identify scientific quantities in the MAHAM API.
+### EXTERNAL
 
-## Neutrino flavor conventions
+Data managed outside MAHAM and supplied through a user-provided path.
 
-MAHAM does not silently convert between per-flavor and all-flavor neutrino quantities.
+This mode is appropriate for large files, private data, collaboration data, and other resources that MAHAM should not download or redistribute.
 
-A conversion between `per_flavor` and `all_flavor` requires an explicit physical assumption. The currently supported assumption is `equal`, corresponding to equal fluxes in the three neutrino flavors at Earth.
 
-For example:
+## Data design
 
-`per_flavor -> all_flavor` uses a factor of 3 only when `flavor_assumption="equal"` is explicitly requested.
+MAHAM should not become a data warehouse.
 
-The original flavor convention of every published dataset is retained in its metadata.
+The preferred hierarchy is:
 
-Flavor sums and particle/antiparticle conventions in detector-response datasets must also be explicit. For example, an effective area that is summed across `nue`, `numu`, and `nutau`, or averaged between `nu` and `nubar`, should record those conventions in metadata rather than relying on column names alone.
+1. official machine-readable release
+2. authoritative repository or archival dataset
+3. published numerical table
+4. author-provided data
+5. curated scientific database
+6. careful figure digitization when no numerical release exists
 
-### Spectral conventions
+Large scientific products should normally remain remote or external. Small tables that are necessary for reproducibility may be bundled.
 
-MAHAM distinguishes a dataset's native spectral notation from derived representations.
+A single scientific publication may produce more than one MAHAM dataset. For example, an event record, flux inference, and effective-area release are distinct scientific objects and should remain separate.
 
-Supported notation families currently include:
 
-- `phi`, `Ephi`, `E2phi`, `E3phi`
-- `J`, `EJ`, `E2J`, `E3J`
+## Spectral representation
 
-Energy weighting within one notation family is a direct mathematical conversion.
+MAHAM separates the underlying physical differential intensity from its plotted energy weighting.
 
-Conversion between `J` and `phi` is allowed only for datasets explicitly marked with:
+Supported representations include:
 
-`spectral_kind="differential_intensity"`
+- `phi`
+- `Ephi`
+- `E2phi`
+- `E3phi`
+- `J`
+- `EJ`
+- `E2J`
+- `E3J`
 
-This prevents unrelated quantities such as point-source fluxes from being silently reinterpreted as diffuse intensities.
+Energy weighting is reversible.
 
-Arbitrary energy weighting, including conventions such as `E^2.6 J`, is provided through the spectrum-weighting API.
+Cross-family `J <-> phi` conversion is permitted only when the dataset explicitly represents a differential intensity.
 
-Experiment-specific scientific validation reproduces the native publication convention. Cross-experiment comparisons may use a common derived representation and common physical units.
+Neutrino flavor conventions are handled independently of spectral weighting. Conversions requiring physical assumptions, such as equal flavor composition, must be requested explicitly.
