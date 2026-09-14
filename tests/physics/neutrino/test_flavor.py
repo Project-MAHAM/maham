@@ -1,8 +1,7 @@
 import astropy.units as u
 import pytest
 
-from maham.spectra import convert_flavor_convention
-
+from maham.physics.neutrino import convert_flavor_convention
 
 def test_per_flavor_to_all_flavor():
     value = 2e-8 * u.GeV / (u.cm**2 * u.s * u.sr)

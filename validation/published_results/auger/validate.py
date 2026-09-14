@@ -6,7 +6,7 @@ import numpy as np
 
 from maham.datasets import get_dataset
 from maham.plotting import apply_plot_style, bold_legend, bold_tick_labels
-from maham.spectra import apply_energy_weighting
+from maham.physics.spectra import apply_energy_weighting
 
 
 OUTPUT_DIR = Path(__file__).resolve().parent / "outputs"

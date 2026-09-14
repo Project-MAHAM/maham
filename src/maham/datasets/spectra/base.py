@@ -4,7 +4,7 @@ from pathlib import Path
 from astropy.table import QTable, Table
 
 from maham.datasets.base import Dataset
-from maham.spectra.conversions import convert_differential_intensity, convert_spectral_quantity, normalize_spectral_quantity, spectral_quantity_info
+from maham.physics.spectra import convert_differential_intensity, convert_spectral_quantity, normalize_spectral_quantity, spectral_quantity_info
 
 
 class SpectrumDataset(Dataset):

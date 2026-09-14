@@ -1,7 +1,7 @@
 from astropy.table import QTable
 
 from maham.datasets.spectra.base import SpectrumDataset
-from maham.spectra.flavor import convert_flavor_convention, normalize_flavor_convention
+from maham.physics.neutrino import convert_flavor_convention, normalize_flavor_convention
 
 
 class NeutrinoSpectrumDataset(SpectrumDataset):

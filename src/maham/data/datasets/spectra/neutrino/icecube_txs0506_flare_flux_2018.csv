@@ -1,0 +1,2 @@
+reference_energy_TeV,phi100_TeV_inv_cm2_s,phi100_lower_TeV_inv_cm2_s,phi100_upper_TeV_inv_cm2_s,spectral_index,spectral_index_err,window_start_mjd,window_end_mjd,window_duration_days,signal_events,signal_events_err,ra_deg,dec_deg,global_significance_sigma
+100.0,1.6e-15,1.0e-15,2.3e-15,2.2,0.2,56937.81,57096.21,158.0,13,5,77.3582,5.69314,3.5
