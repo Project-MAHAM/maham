@@ -36,6 +36,12 @@ class _KPSCosmogenicModel(TabulatedNeutrinoFluxModel):
     nonpositive_flux_policy = "truncate_at_first"
 
 
+class _YoshidaMeier2026CosmogenicModel(TabulatedNeutrinoFluxModel):
+    energy_column = "Energy"
+    value_column = "FluxE2"
+    values_are_log10 = False
+
+
 def _metadata(model_id, title, filename, sha256, year, paper_title, authors, arxiv, doi, variant=None, extra_notes=()):
     return ModelMetadata(
         id=model_id,
@@ -102,6 +108,49 @@ def _kps_metadata(model_id, title, filename, sha256, variant, support_note, extr
             *extra_notes,
         ),
         tags=("neutrino", "cosmogenic", "UHECR", "Telescope Array", "KM3-230213A", "derived"),
+    )
+
+
+
+def _yoshida_meier_metadata(model_id, title, filename, sha256, variant, extra_notes=()):
+    return ModelMetadata(
+        id=model_id,
+        title=title,
+        messenger="neutrino",
+        model_type="flux",
+        family="cosmogenic",
+        description="High-redshift cosmogenic neutrino flux prediction from ultrahigh-energy proton emission by the early AGN population observed by JWST.",
+        year=2026,
+        variant=variant,
+        source=DataSource(provenance=ProvenanceType.DIGITIZED, storage=StorageMode.BUNDLED, path=f"{_ROOT}/{filename}", sha256=sha256),
+        paper=Reference(
+            title="Ultrahigh-energy cosmogenic neutrino emissions in the high-redshift universe",
+            authors=("Shigeru Yoshida", "Maximilian Meier"),
+            year=2026,
+            doi="10.1103/ljz7-phzv",
+            url="https://arxiv.org/abs/2604.14535",
+        ),
+        data_reference=Reference(
+            title="arXiv source package for Ultrahigh-energy cosmogenic neutrino emissions in the high-redshift universe",
+            authors=("Shigeru Yoshida", "Maximilian Meier"),
+            year=2026,
+            url="https://arxiv.org/src/2604.14535",
+        ),
+        quantity="E2phi",
+        spectral_kind="differential_intensity",
+        energy_unit="GeV",
+        value_unit="GeV / (cm2 s sr)",
+        flavor_convention="all_flavor",
+        solid_angle_convention="diffuse",
+        notes=(
+            "Numerical curve was extracted from the vector content of the authors' nu_energy_distribution_units_gf_allflavor.pdf figure because the arXiv source package contains no machine-readable flux table.",
+            "The source figure PDF has SHA256 b4bbaed45392ed7efaedf7283012a4d96a63e3fba312e12c7eab357d32b06435.",
+            "Native representation is all-flavor E2phi diffuse intensity with neutrino flavor mixing included.",
+            "The nominal CRPropa curve assumes maximum proton energy E_p,max=1e10 GeV and L_CR=1e45 erg/s.",
+            "MAHAM does not extrapolate beyond the digitized energy support.",
+            *extra_notes,
+        ),
+        tags=("neutrino", "cosmogenic", "UHECR", "high-redshift", "AGN", "JWST", "digitized"),
     )
 
 
@@ -239,4 +288,28 @@ class KuznetsovPetrovSavchenko2026LocalMinCosmogenic(_KPSCosmogenicModel):
         "local-minimum Telescope Array UHECR solution",
         "The leading positive support contains 787 points from 1e5 to 3.217e10 GeV.",
         extra_notes=("Source configuration: Rmax=15.8 EeV, spectral slope -0.78, injected composition 97.1% protons and 2.9% Fe.",),
+    )
+
+
+@register_model
+class YoshidaMeier2026NoEvolutionCosmogenic(_YoshidaMeier2026CosmogenicModel):
+    metadata = _yoshida_meier_metadata(
+        "neutrino.cosmogenic.yoshida_meier_2026_no_evolution",
+        "Yoshida and Meier 2026 high-redshift cosmogenic neutrino flux: no evolution",
+        "yoshida_meier_2026_no_evolution.csv",
+        "62ad7db9ffa53eac6d792cfbfe68d8a544a046bb796394808bc8b9003e04246f",
+        "no source-density evolution",
+        extra_notes=("The baseline source density is n0=1e-5 Mpc^-3.",),
+    )
+
+
+@register_model
+class YoshidaMeier2026LogNormalCosmogenic(_YoshidaMeier2026CosmogenicModel):
+    metadata = _yoshida_meier_metadata(
+        "neutrino.cosmogenic.yoshida_meier_2026_log_normal",
+        "Yoshida and Meier 2026 high-redshift cosmogenic neutrino flux: log-normal evolution",
+        "yoshida_meier_2026_log_normal.csv",
+        "4a78c22a8a9a0fa40f307e3db5ac9802bbc84b97599dbad64b1f209991d0a40b",
+        "log-normal source-density evolution",
+        extra_notes=("The source-density evolution follows the log-normal high-redshift evolution considered in the paper.",),
     )

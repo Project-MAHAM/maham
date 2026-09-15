@@ -178,6 +178,8 @@ MAHAM/
 │       │   │   │       │   ├── kuznetsov_petrov_savchenko_2026_local_min.csv
 │       │   │   │       │   ├── muzio_farrar_2023.json
 │       │   │   │       │   ├── muzio_unger_wissel_2023.json
+│       │   │   │       │   ├── yoshida_meier_2026_log_normal.csv
+│       │   │   │       │   ├── yoshida_meier_2026_no_evolution.csv
 │       │   │   │       │   └── zhang_murase_2019.json
 │       │   │   │       └── source_environment/
 │       │   │   │           ├── boncioli_llgrb_2019.json
@@ -363,6 +365,7 @@ Examples:
 - Telescope Array combined-spectrum digitization
 - KM3NeT-curated cosmogenic and source-environment neutrino model curves
 - Reproducibly derived literature-model tables preserved with pinned provenance and checksums
+- Figure-extracted literature-model curves preserved with explicit digitization provenance and source-figure checksums
 
 ### REMOTE
 
@@ -400,7 +403,7 @@ A single scientific publication may produce more than one MAHAM object. For exam
 
 Models and datasets are also kept conceptually distinct. A model represents a named theoretical or phenomenological prediction. A dataset represents an observational, experimental, or released scientific product.
 
-Bundled source tables should preserve the source values and be protected by checksums where appropriate. Standardization required for MAHAM's numerical interfaces, such as energy ordering, duplicate-energy handling, or restriction to a physically valid support, belongs in the loader rather than in silent modification of the bundled source file. Model-specific standardization must be explicit, documented in metadata, and covered by tests.
+Bundled source tables should preserve the source values and be protected by checksums where appropriate. Standardization required for MAHAM's numerical interfaces, such as energy ordering, duplicate-energy handling, or model-specific support restriction, belongs in the loader rather than in silent modification of the bundled source file. Model-specific standardization must be explicit, scientifically justified, documented in metadata, and covered by tests.
 
 ## Spectral representation
 
@@ -422,3 +425,4 @@ Energy weighting is reversible.
 Cross-family `J <-> phi` conversion is permitted only when the dataset or model explicitly represents a differential intensity.
 
 Neutrino flavor conventions are handled independently of spectral weighting. Conversions requiring physical assumptions, such as equal flavor composition, must be requested explicitly.
+

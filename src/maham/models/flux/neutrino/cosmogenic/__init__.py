@@ -11,6 +11,8 @@ from maham.models.flux.neutrino.cosmogenic.models import (
     MuzioFarrar2023Cosmogenic,
     MuzioUngerWissel2023Cosmogenic,
     ZhangMurase2019Cosmogenic,
+    YoshidaMeier2026LogNormalCosmogenic,
+    YoshidaMeier2026NoEvolutionCosmogenic,
 )
 
 __all__ = [
@@ -26,4 +28,6 @@ __all__ = [
     "MuzioFarrar2023Cosmogenic",
     "MuzioUngerWissel2023Cosmogenic",
     "ZhangMurase2019Cosmogenic",
+    "YoshidaMeier2026LogNormalCosmogenic",
+    "YoshidaMeier2026NoEvolutionCosmogenic",
 ]
