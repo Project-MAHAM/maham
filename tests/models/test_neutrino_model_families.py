@@ -17,9 +17,9 @@ def test_source_environment_family_envelope():
     table = family_envelope("source_environment", flavor="all_flavor", flavor_assumption="equal")
     assert table.meta["family"] == "source_environment"
     assert table.meta["flavor_convention"] == "all_flavor"
-    assert len(table.meta["model_ids"]) == 8
+    assert len(table.meta["model_ids"]) == 9
     assert np.max(table["n_models"]) > 1
-    assert np.max(table["n_models"]) <= 8
+    assert np.max(table["n_models"]) <= 9
     assert np.all(table["E2phi_lower"][table["n_models"] > 0] <= table["E2phi_upper"][table["n_models"] > 0])
 
 

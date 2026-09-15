@@ -29,6 +29,7 @@ SOURCE_ENVIRONMENT = {
     "neutrino.source_environment.rodrigues_agn_2021": 161,
     "neutrino.source_environment.rodrigues_bllac_2024": 59,
     "neutrino.source_environment.rodrigues_fsrq_2024": 62,
+    "neutrino.source_environment.km3net_blazar_population_2026_best_fit": 55,
     "neutrino.source_environment.tamborra_llgrb_2015": 86,
     "neutrino.source_environment.tamborra_sgrb_2015": 77,
     "neutrino.source_environment.winter_tde_2023": 75,
@@ -52,6 +53,8 @@ ALLARD_2026_COSMOGENIC = {
 
 DIGITIZED_COSMOGENIC = YOSHIDA_MEIER_COSMOGENIC | ALLARD_2026_COSMOGENIC
 ALL_FLAVOR_COSMOGENIC = DIGITIZED_COSMOGENIC
+
+DIGITIZED_SOURCE_ENVIRONMENT = {"neutrino.source_environment.km3net_blazar_population_2026_best_fit"}
 
 
 @pytest.mark.parametrize(("model_id", "n_points"), {**COSMOGENIC, **SOURCE_ENVIRONMENT}.items())
@@ -77,12 +80,12 @@ def test_cosmogenic_registry_membership():
 
 def test_source_environment_registry_membership():
     models = list_models(messenger="neutrino", model_type="flux", family="source_environment")
-    assert len(models) == 8
+    assert len(models) == 9
     assert {model.id for model in models} == set(SOURCE_ENVIRONMENT)
 
 
 def test_km3net_curated_models_have_curated_provenance():
-    model_ids = (set(COSMOGENIC) - DERIVED_COSMOGENIC - DIGITIZED_COSMOGENIC) | set(SOURCE_ENVIRONMENT)
+    model_ids = (set(COSMOGENIC) - DERIVED_COSMOGENIC - DIGITIZED_COSMOGENIC) | (set(SOURCE_ENVIRONMENT) - DIGITIZED_SOURCE_ENVIRONMENT)
     for model_id in model_ids:
         model = get_model(model_id)
         assert model.metadata.source.provenance.value == "curated_database"
@@ -117,6 +120,35 @@ def test_allard_2026_reference_metadata():
         model = get_model(model_id)
         assert model.metadata.paper.url == "https://arxiv.org/abs/2608.16540"
         assert model.metadata.data_reference.title == "Figure 4 of arXiv:2608.16540v1"
+
+
+def test_km3net_blazar_population_2026_metadata():
+    model = get_model("neutrino.source_environment.km3net_blazar_population_2026_best_fit")
+    assert model.metadata.source.provenance.value == "digitized"
+    assert model.metadata.source.storage.value == "bundled"
+    assert model.metadata.paper.doi == "10.1088/1475-7516/2026/03/033"
+    assert model.metadata.data_reference.title == "Figure 4 of Blazars as a potential origin of the KM3-230213A event"
+    assert model.metadata.flavor_convention == "per_flavor"
+
+
+def test_km3net_blazar_population_2026_digitized_curve():
+    model = get_model("neutrino.source_environment.km3net_blazar_population_2026_best_fit")
+    table = model.load_e2phi()
+    flux_unit = u.GeV / (u.cm**2 * u.s * u.sr)
+    peak = int(np.argmax(table["E2phi"]))
+    assert len(table) == 55
+    assert table.meta["flavor_convention"] == "per_flavor"
+    assert u.isclose(table["energy"][0], 1.0e6 * u.GeV, rtol=1e-12)
+    assert u.isclose(table["energy"][-1], 4.90049177e8 * u.GeV, rtol=1e-12)
+    assert u.isclose(table["energy"][peak], 4.46683592e7 * u.GeV, rtol=1e-12)
+    assert u.isclose(table["E2phi"][peak], 6.22574779e-10 * flux_unit, rtol=1e-12)
+    all_flavor = model.load_e2phi(flavor="all_flavor", flavor_assumption="equal")
+    assert u.allclose(all_flavor["E2phi"], 3.0 * table["E2phi"])
+
+
+def test_km3net_blazar_population_2026_does_not_extrapolate():
+    value = get_model("neutrino.source_environment.km3net_blazar_population_2026_best_fit").evaluate(1.0e9 * u.GeV)
+    assert np.isnan(value.value)
 
 
 def test_literature_model_all_flavor_conversion():
