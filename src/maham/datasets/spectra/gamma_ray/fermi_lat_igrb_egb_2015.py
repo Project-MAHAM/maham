@@ -6,7 +6,6 @@ from maham._core.metadata import DataSource, DatasetMetadata, ProvenanceType, Re
 from maham.datasets.registry import register_dataset
 from maham.datasets.spectra.gamma_ray.base import GammaRaySpectrumDataset
 
-
 SOURCE_URL = "https://cdsarc.cds.unistra.fr/ftp/J/ApJ/799/86/table3.dat"
 SOURCE_SHA256 = "438ba07ab0feeb1430e4266ad556532abe25f99647f04cb34087b61b8e59c032"
 PAPER_DOI = "10.1088/0004-637X/799/1/86"
@@ -14,22 +13,10 @@ VIZIER_DOI = "10.26093/cds/vizier.17990086"
 IGRB_FINAL_UPPER_LIMIT = 2.3e-12
 
 RAW_COLUMNS = (
-    "model",
-    "energy_min",
-    "energy_max",
-    "igrb",
-    "igrb_err_upper",
-    "igrb_err_lower",
-    "igrb_foreground_err_upper",
-    "igrb_foreground_err_lower",
-    "egb",
-    "egb_err_upper",
-    "egb_err_lower",
-    "egb_foreground_err_upper",
-    "egb_foreground_err_lower",
-    "resolved_sources",
-    "resolved_sources_err_upper",
-    "resolved_sources_err_lower",
+    "model", "energy_min", "energy_max",
+    "igrb", "igrb_err_upper", "igrb_err_lower", "igrb_foreground_err_upper", "igrb_foreground_err_lower",
+    "egb", "egb_err_upper", "egb_err_lower", "egb_foreground_err_upper", "egb_foreground_err_lower",
+    "resolved_sources", "resolved_sources_err_upper", "resolved_sources_err_lower",
 )
 
 
@@ -39,14 +26,11 @@ class _FermiLATDiffuseGamma2015(GammaRaySpectrumDataset):
     def load_raw(self, cache: bool = True, show_progress: bool = True) -> Table:
         path = self.fetch(cache=cache, show_progress=show_progress)
         rows = []
-
         with path.open() as f:
             for line in f:
                 fields = line.split()
-                if not fields:
-                    continue
-                rows.append([fields[0], *map(float, fields[1:])])
-
+                if fields:
+                    rows.append([fields[0], *map(float, fields[1:])])
         table = Table(rows=rows, names=RAW_COLUMNS)
         return table[np.asarray(table["model"]) == "A"]
 
@@ -55,15 +39,21 @@ class _FermiLATDiffuseGamma2015(GammaRaySpectrumDataset):
         energy_max = np.asarray(raw["energy_max"], dtype=float)
         energy = np.sqrt(energy_min * energy_max)
         width = energy_max - energy_min
-
         flux = np.asarray(raw[self.component], dtype=float).copy()
         err_upper = np.asarray(raw[f"{self.component}_err_upper"], dtype=float).copy()
         err_lower = np.asarray(raw[f"{self.component}_err_lower"], dtype=float).copy()
-        foreground_err_upper = np.asarray(raw[f"{self.component}_foreground_err_upper"], dtype=float).copy()
-        foreground_err_lower = np.asarray(raw[f"{self.component}_foreground_err_lower"], dtype=float).copy()
+
+        foreground_upper_column = f"{self.component}_foreground_err_upper"
+        foreground_lower_column = f"{self.component}_foreground_err_lower"
+        has_foreground_uncertainty = foreground_upper_column in raw.colnames and foreground_lower_column in raw.colnames
+        if has_foreground_uncertainty:
+            foreground_err_upper = np.asarray(raw[foreground_upper_column], dtype=float).copy()
+            foreground_err_lower = np.asarray(raw[foreground_lower_column], dtype=float).copy()
+        else:
+            foreground_err_upper = np.full(len(raw), np.nan)
+            foreground_err_lower = np.full(len(raw), np.nan)
 
         is_upper_limit = np.zeros(len(raw), dtype=bool)
-
         if self.component == "igrb":
             is_upper_limit[-1] = True
             flux[-1] = IGRB_FINAL_UPPER_LIMIT
@@ -77,7 +67,6 @@ class _FermiLATDiffuseGamma2015(GammaRaySpectrumDataset):
         phi_err_lower = err_lower / width
         phi_foreground_err_upper = foreground_err_upper / width
         phi_foreground_err_lower = foreground_err_lower / width
-
         energy_unit = u.MeV
         flux_unit = 1 / (u.cm**2 * u.s * u.sr)
         phi_unit = 1 / (u.MeV * u.cm**2 * u.s * u.sr)
@@ -93,11 +82,13 @@ class _FermiLATDiffuseGamma2015(GammaRaySpectrumDataset):
         table["phi_foreground_err_upper"] = phi_foreground_err_upper * phi_unit
         table["integrated_flux"] = flux * flux_unit
         table["is_upper_limit"] = is_upper_limit
-
         table.meta["dataset_id"] = self.metadata.id
         table.meta["quantity"] = "phi"
         table.meta["native_published_quantity"] = "band_integrated_flux"
-        table.meta["foreground_model"] = "A"
+        table.meta["source_table_model"] = "A"
+        table.meta["has_foreground_model_uncertainty"] = has_foreground_uncertainty
+        if has_foreground_uncertainty:
+            table.meta["foreground_model"] = "A"
         table.meta["energy_representative"] = "geometric_mean"
         table.meta["differential_conversion"] = "integrated_flux / (energy_max - energy_min)"
         return table
@@ -106,7 +97,6 @@ class _FermiLATDiffuseGamma2015(GammaRaySpectrumDataset):
 @register_dataset
 class FermiLATIGRB2015(_FermiLATDiffuseGamma2015):
     component = "igrb"
-
     metadata = DatasetMetadata(
         id="fermi_lat.igrb.2015",
         title="Fermi-LAT isotropic gamma-ray background spectrum",
@@ -119,24 +109,9 @@ class FermiLATIGRB2015(_FermiLATDiffuseGamma2015):
         spectral_kind="differential_intensity",
         energy_unit="MeV",
         value_unit="MeV-1 cm-2 s-1 sr-1",
-        paper=Reference(
-            title="The spectrum of isotropic diffuse gamma-ray emission between 100 MeV and 820 GeV",
-            authors=("Fermi-LAT Collaboration",),
-            year=2015,
-            doi=PAPER_DOI,
-        ),
-        dataset_reference=Reference(
-            title="VizieR J/ApJ/799/86",
-            authors=("Ackermann et al.",),
-            year=2015,
-            doi=VIZIER_DOI,
-        ),
-        source=DataSource(
-            provenance=ProvenanceType.CURATED_DATABASE,
-            storage=StorageMode.REMOTE,
-            url=SOURCE_URL,
-            sha256=SOURCE_SHA256,
-        ),
+        paper=Reference(title="The spectrum of isotropic diffuse gamma-ray emission between 100 MeV and 820 GeV", authors=("Fermi-LAT Collaboration",), year=2015, doi=PAPER_DOI),
+        dataset_reference=Reference(title="VizieR J/ApJ/799/86", authors=("Ackermann et al.",), year=2015, doi=VIZIER_DOI),
+        source=DataSource(provenance=ProvenanceType.CURATED_DATABASE, storage=StorageMode.REMOTE, url=SOURCE_URL, sha256=SOURCE_SHA256),
         notes=(
             "Uses Galactic foreground model A, the baseline model in the publication.",
             "Published values are band-integrated intensities; MAHAM derives bin-averaged differential intensity by dividing by the bin width.",
@@ -152,7 +127,6 @@ class FermiLATIGRB2015(_FermiLATDiffuseGamma2015):
 @register_dataset
 class FermiLATEGB2015(_FermiLATDiffuseGamma2015):
     component = "egb"
-
     metadata = DatasetMetadata(
         id="fermi_lat.egb.2015",
         title="Fermi-LAT total extragalactic gamma-ray background spectrum",
@@ -165,24 +139,9 @@ class FermiLATEGB2015(_FermiLATDiffuseGamma2015):
         spectral_kind="differential_intensity",
         energy_unit="MeV",
         value_unit="MeV-1 cm-2 s-1 sr-1",
-        paper=Reference(
-            title="The spectrum of isotropic diffuse gamma-ray emission between 100 MeV and 820 GeV",
-            authors=("Fermi-LAT Collaboration",),
-            year=2015,
-            doi=PAPER_DOI,
-        ),
-        dataset_reference=Reference(
-            title="VizieR J/ApJ/799/86",
-            authors=("Ackermann et al.",),
-            year=2015,
-            doi=VIZIER_DOI,
-        ),
-        source=DataSource(
-            provenance=ProvenanceType.CURATED_DATABASE,
-            storage=StorageMode.REMOTE,
-            url=SOURCE_URL,
-            sha256=SOURCE_SHA256,
-        ),
+        paper=Reference(title="The spectrum of isotropic diffuse gamma-ray emission between 100 MeV and 820 GeV", authors=("Fermi-LAT Collaboration",), year=2015, doi=PAPER_DOI),
+        dataset_reference=Reference(title="VizieR J/ApJ/799/86", authors=("Ackermann et al.",), year=2015, doi=VIZIER_DOI),
+        source=DataSource(provenance=ProvenanceType.CURATED_DATABASE, storage=StorageMode.REMOTE, url=SOURCE_URL, sha256=SOURCE_SHA256),
         notes=(
             "Uses Galactic foreground model A, the baseline model in the publication.",
             "Total EGB is the IGRB plus resolved sources.",
@@ -192,4 +151,34 @@ class FermiLATEGB2015(_FermiLATDiffuseGamma2015):
             "Galactic foreground-model uncertainties are retained separately.",
         ),
         tags=("Fermi-LAT", "gamma ray", "EGB", "extragalactic", "diffuse", "spectrum"),
+    )
+
+
+@register_dataset
+class FermiLATResolvedSources2015(_FermiLATDiffuseGamma2015):
+    component = "resolved_sources"
+    metadata = DatasetMetadata(
+        id="fermi_lat.resolved_sources.2015",
+        title="Fermi-LAT resolved-source gamma-ray spectrum",
+        experiment="Fermi-LAT",
+        messenger="gamma_ray",
+        data_type="spectrum",
+        description="Integrated gamma-ray intensity from sources resolved individually by Fermi-LAT at Galactic latitudes |b| > 20 deg in Table 3.",
+        year=2015,
+        quantity="phi",
+        spectral_kind="differential_intensity",
+        energy_unit="MeV",
+        value_unit="MeV-1 cm-2 s-1 sr-1",
+        paper=Reference(title="The spectrum of isotropic diffuse gamma-ray emission between 100 MeV and 820 GeV", authors=("Fermi-LAT Collaboration",), year=2015, doi=PAPER_DOI),
+        dataset_reference=Reference(title="VizieR J/ApJ/799/86", authors=("Ackermann et al.",), year=2015, doi=VIZIER_DOI),
+        source=DataSource(provenance=ProvenanceType.CURATED_DATABASE, storage=StorageMode.REMOTE, url=SOURCE_URL, sha256=SOURCE_SHA256),
+        notes=(
+            "Table 3 labels this component as the integrated flux of sources in each energy band.",
+            "The source contribution contains sources resolved individually at Galactic latitudes |b| > 20 deg.",
+            "Published values are band-integrated intensities; MAHAM derives bin-averaged differential intensity by dividing by the bin width.",
+            "Representative energy is the geometric mean of each energy bin.",
+            "Quoted resolved-source uncertainties are retained; no separate Galactic foreground-model uncertainty is published for this component.",
+            "Model-A rows are selected to share the same 26-bin grid as the IGRB and EGB products.",
+        ),
+        tags=("Fermi-LAT", "gamma ray", "resolved sources", "high latitude", "spectrum"),
     )
