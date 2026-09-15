@@ -1,3 +1,6 @@
+# MAHAM Architecture
+
+```text
 MAHAM/
 ├── src/
 │   └── maham/
@@ -79,7 +82,15 @@ MAHAM/
 │       │   ├── flux/
 │       │   │   ├── __init__.py
 │       │   │   ├── neutrino/
-│       │   │   │   └── __init__.py
+│       │   │   │   ├── __init__.py
+│       │   │   │   ├── base.py
+│       │   │   │   ├── ensemble.py
+│       │   │   │   ├── cosmogenic/
+│       │   │   │   │   ├── __init__.py
+│       │   │   │   │   └── models.py
+│       │   │   │   └── source_environment/
+│       │   │   │       ├── __init__.py
+│       │   │   │       └── models.py
 │       │   │   ├── cosmic_ray/
 │       │   │   │   └── __init__.py
 │       │   │   └── gamma_ray/
@@ -152,10 +163,29 @@ MAHAM/
 │       │           └── km3net_230213a_2025.py
 │       ├── data/
 │       │   ├── models/
+│       │   │   ├── README.md
 │       │   │   ├── flux/
-│       │   │   │   ├── neutrino/
-│       │   │   │   ├── cosmic_ray/
-│       │   │   │   └── gamma_ray/
+│       │   │   │   └── neutrino/
+│       │   │   │       ├── cosmogenic/
+│       │   │   │       │   ├── aloisio_2015.json
+│       │   │   │       │   ├── auger_2023.json
+│       │   │   │       │   ├── berat_2024.json
+│       │   │   │       │   ├── boncioli_2019.json
+│       │   │   │       │   ├── condorelli_2023.json
+│       │   │   │       │   ├── ehlert_2024.json
+│       │   │   │       │   ├── heinze_2019.json
+│       │   │   │       │   ├── muzio_farrar_2023.json
+│       │   │   │       │   ├── muzio_unger_wissel_2023.json
+│       │   │   │       │   └── zhang_murase_2019.json
+│       │   │   │       └── source_environment/
+│       │   │   │           ├── boncioli_llgrb_2019.json
+│       │   │   │           ├── fang_pulsar_2014.json
+│       │   │   │           ├── rodrigues_agn_2021.json
+│       │   │   │           ├── rodrigues_bllac_2024.json
+│       │   │   │           ├── rodrigues_fsrq_2024.json
+│       │   │   │           ├── tamborra_llgrb_2015.json
+│       │   │   │           ├── tamborra_sgrb_2015.json
+│       │   │   │           └── winter_tde_2023.json
 │       │   │   ├── cross_sections/
 │       │   │   ├── sources/
 │       │   │   ├── attenuation/
@@ -205,6 +235,11 @@ MAHAM/
 │   ├── multimessenger/
 │   ├── radio/
 │   ├── models/
+│   │   ├── test_registry.py
+│   │   ├── test_neutrino_flux.py
+│   │   ├── test_neutrino_ensemble.py
+│   │   ├── test_neutrino_literature_models.py
+│   │   └── test_neutrino_model_families.py
 │   ├── datasets/
 │   │   ├── test_base.py
 │   │   ├── test_registry.py
@@ -269,6 +304,7 @@ MAHAM/
 ├── README.md
 ├── LICENSE
 └── .gitignore
+```
 
 ## Architecture principles
 
@@ -287,10 +323,9 @@ MAHAM is organized by scientific concept rather than by experiment.
 - Generic scientific concepts should not be placed in experiment-specific top-level namespaces.
 - `utils` and `helpers` catch-all modules are avoided. Functionality belongs in the scientific concept that owns it.
 
+## Scientific provenance
 
-## Dataset provenance
-
-Every scientific dataset records how the values entered MAHAM.
+Every scientific dataset and model records how its numerical values entered MAHAM.
 
 Supported provenance classes include:
 
@@ -308,21 +343,23 @@ Supported provenance classes include:
 
 `DIGITIZED` is reserved for values reconstructed from figures or other graphical material.
 
-`DERIVED` is used when MAHAM computes a dataset from another scientific source rather than reproducing directly released values.
+`CURATED_DATABASE` is used when MAHAM preserves numerical values from a recognized scientific compilation or curated release while retaining both the original scientific reference and the curated data reference.
 
+`DERIVED` is used when MAHAM computes a scientific product from another source rather than reproducing directly released values.
 
-## Dataset storage
+## Scientific data storage
 
 MAHAM supports three storage modes.
 
 ### BUNDLED
 
-Small curated, transcribed, or digitized data distributed with the package.
+Small curated, transcribed, digitized, or otherwise reproducibility-critical data distributed with the package.
 
 Examples:
 
 - IceCube 9.5-year through-going muon piece-wise flux
 - Telescope Array combined-spectrum digitization
+- KM3NeT-curated cosmogenic and source-environment neutrino model curves
 
 ### REMOTE
 
@@ -341,12 +378,11 @@ Data managed outside MAHAM and supplied through a user-provided path.
 
 This mode is appropriate for large files, private data, collaboration data, and other resources that MAHAM should not download or redistribute.
 
-
-## Data design
+## Data and model design
 
 MAHAM should not become a data warehouse.
 
-The preferred hierarchy is:
+The preferred hierarchy for numerical scientific information is:
 
 1. official machine-readable release
 2. authoritative repository or archival dataset
@@ -355,10 +391,13 @@ The preferred hierarchy is:
 5. curated scientific database
 6. careful figure digitization when no numerical release exists
 
-Large scientific products should normally remain remote or external. Small tables that are necessary for reproducibility may be bundled.
+Large scientific products should normally remain remote or external. Small tables necessary for reproducibility may be bundled.
 
-A single scientific publication may produce more than one MAHAM dataset. For example, an event record, flux inference, and effective-area release are distinct scientific objects and should remain separate.
+A single scientific publication may produce more than one MAHAM object. For example, an event record, flux inference, effective-area release, and theoretical model are distinct scientific objects and should remain separate.
 
+Models and datasets are also kept conceptually distinct. A model represents a named theoretical or phenomenological prediction. A dataset represents an observational, experimental, or released scientific product.
+
+Bundled source tables should preserve the source values and be protected by checksums where appropriate. Standardization required for MAHAM's numerical interfaces, such as energy ordering, belongs in the loader rather than in silent modification of the bundled source file.
 
 ## Spectral representation
 
@@ -377,6 +416,6 @@ Supported representations include:
 
 Energy weighting is reversible.
 
-Cross-family `J <-> phi` conversion is permitted only when the dataset explicitly represents a differential intensity.
+Cross-family `J <-> phi` conversion is permitted only when the dataset or model explicitly represents a differential intensity.
 
 Neutrino flavor conventions are handled independently of spectral weighting. Conversions requiring physical assumptions, such as equal flavor composition, must be requested explicitly.

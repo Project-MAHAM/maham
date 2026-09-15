@@ -114,6 +114,7 @@ class TabulatedNeutrinoFluxModel(NeutrinoFluxModel):
     energy_column: str | None = None
     value_column: str | None = None
     values_are_log10: bool = False
+    duplicate_energy_policy: str = "error"
 
     def load_native(self, cache: bool = True, show_progress: bool = True) -> QTable:
         if self.energy_column is None or self.value_column is None:
@@ -131,6 +132,10 @@ class TabulatedNeutrinoFluxModel(NeutrinoFluxModel):
 
         energy = frame[self.energy_column].to_numpy(dtype=float)
         values = frame[self.value_column].to_numpy(dtype=float)
+        order = np.argsort(energy, kind="stable")
+        energy = energy[order]
+        values = values[order]
+        energy, values = self._resolve_duplicate_energies(energy, values)
         if self.values_are_log10:
             values = 10.0**values
 
@@ -139,3 +144,15 @@ class TabulatedNeutrinoFluxModel(NeutrinoFluxModel):
         table["energy"] = energy * u.Unit(self.metadata.energy_unit)
         table[quantity] = values * u.Unit(self.metadata.value_unit)
         return table
+
+    def _resolve_duplicate_energies(self, energy: np.ndarray, values: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+        if len(energy) < 2 or not np.any(np.diff(energy) == 0):
+            return energy, values
+        if self.duplicate_energy_policy == "error":
+            raise ValueError(f"Tabulated model '{self.id}' contains duplicate energy values.")
+        if self.duplicate_energy_policy != "mean_native":
+            raise ValueError(f"Unsupported duplicate_energy_policy for '{self.id}': {self.duplicate_energy_policy}")
+        unique_energy, inverse = np.unique(energy, return_inverse=True)
+        counts = np.bincount(inverse)
+        mean_values = np.bincount(inverse, weights=values) / counts
+        return unique_energy, mean_values
