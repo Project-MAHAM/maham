@@ -41,4 +41,4 @@ testpaths = ["tests"]
 line-length = 120
 
 [tool.setuptools.package-data]
-maham = ["data/**/*.csv"]
+maham = ["data/**/*.csv", "data/**/*.json"]

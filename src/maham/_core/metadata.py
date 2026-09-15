@@ -63,3 +63,26 @@ class DatasetMetadata:
     solid_angle_convention: str | None = None
     notes: tuple[str, ...] = ()
     tags: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
+class ModelMetadata:
+    id: str
+    title: str
+    messenger: str
+    model_type: str
+    family: str
+    description: str = ""
+    year: int | None = None
+    variant: str | None = None
+    source: DataSource | None = None
+    paper: Reference | None = None
+    data_reference: Reference | None = None
+    quantity: str | None = None
+    spectral_kind: str | None = None
+    energy_unit: str | None = None
+    value_unit: str | None = None
+    flavor_convention: str | None = None
+    solid_angle_convention: str | None = None
+    notes: tuple[str, ...] = ()
+    tags: tuple[str, ...] = ()
