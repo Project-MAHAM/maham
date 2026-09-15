@@ -3,7 +3,6 @@ import numpy as np
 import pytest
 from maham.models import get_model, list_models
 
-
 COSMOGENIC = {
     "neutrino.cosmogenic.aloisio_2015": 45,
     "neutrino.cosmogenic.berat_2024": 44,
@@ -19,6 +18,9 @@ COSMOGENIC = {
     "neutrino.cosmogenic.kuznetsov_petrov_savchenko_2026_local_min": 787,
     "neutrino.cosmogenic.yoshida_meier_2026_no_evolution": 80,
     "neutrino.cosmogenic.yoshida_meier_2026_log_normal": 86,
+    "neutrino.cosmogenic.allard_2026_frii_model1": 32,
+    "neutrino.cosmogenic.allard_2026_frii_model2": 38,
+    "neutrino.cosmogenic.allard_2026_frii_model3": 42,
 }
 
 SOURCE_ENVIRONMENT = {
@@ -37,11 +39,18 @@ DERIVED_COSMOGENIC = {
     "neutrino.cosmogenic.kuznetsov_petrov_savchenko_2026_local_min",
 }
 
-DIGITIZED_COSMOGENIC = {
+YOSHIDA_MEIER_COSMOGENIC = {
     "neutrino.cosmogenic.yoshida_meier_2026_no_evolution",
     "neutrino.cosmogenic.yoshida_meier_2026_log_normal",
 }
 
+ALLARD_2026_COSMOGENIC = {
+    "neutrino.cosmogenic.allard_2026_frii_model1",
+    "neutrino.cosmogenic.allard_2026_frii_model2",
+    "neutrino.cosmogenic.allard_2026_frii_model3",
+}
+
+DIGITIZED_COSMOGENIC = YOSHIDA_MEIER_COSMOGENIC | ALLARD_2026_COSMOGENIC
 ALL_FLAVOR_COSMOGENIC = DIGITIZED_COSMOGENIC
 
 
@@ -49,7 +58,6 @@ ALL_FLAVOR_COSMOGENIC = DIGITIZED_COSMOGENIC
 def test_literature_model_native_data(model_id, n_points):
     model = get_model(model_id)
     table = model.load()
-
     assert len(table) == n_points
     assert table.meta["quantity"] == "E2phi"
     expected_flavor = "all_flavor" if model_id in ALL_FLAVOR_COSMOGENIC else "per_flavor"
@@ -63,7 +71,7 @@ def test_literature_model_native_data(model_id, n_points):
 
 def test_cosmogenic_registry_membership():
     models = list_models(messenger="neutrino", model_type="flux", family="cosmogenic")
-    assert len(models) == 14
+    assert len(models) == 17
     assert {model.id for model in models} == set(COSMOGENIC)
 
 
@@ -90,13 +98,25 @@ def test_recent_cosmogenic_models_have_derived_provenance(model_id):
 
 
 @pytest.mark.parametrize("model_id", sorted(DIGITIZED_COSMOGENIC))
-def test_yoshida_meier_2026_models_have_digitized_provenance(model_id):
+def test_digitized_cosmogenic_models_have_digitized_provenance(model_id):
     model = get_model(model_id)
     assert model.metadata.source.provenance.value == "digitized"
     assert model.metadata.source.storage.value == "bundled"
-    assert model.metadata.paper.doi == "10.1103/ljz7-phzv"
-    assert model.metadata.data_reference.url == "https://arxiv.org/src/2604.14535"
     assert model.metadata.flavor_convention == "all_flavor"
+
+
+def test_yoshida_meier_2026_reference_metadata():
+    for model_id in YOSHIDA_MEIER_COSMOGENIC:
+        model = get_model(model_id)
+        assert model.metadata.paper.doi == "10.1103/ljz7-phzv"
+        assert model.metadata.data_reference.url == "https://arxiv.org/src/2604.14535"
+
+
+def test_allard_2026_reference_metadata():
+    for model_id in ALLARD_2026_COSMOGENIC:
+        model = get_model(model_id)
+        assert model.metadata.paper.url == "https://arxiv.org/abs/2608.16540"
+        assert model.metadata.data_reference.title == "Figure 4 of arXiv:2608.16540v1"
 
 
 def test_literature_model_all_flavor_conversion():
@@ -127,7 +147,6 @@ def test_kuznetsov_petrov_savchenko_2026_exports(model_id, n_points, last_energy
     model = get_model(model_id)
     table = model.load_e2phi()
     flux_unit = u.GeV / (u.cm**2 * u.s * u.sr)
-
     assert len(table) == n_points
     assert u.isclose(table["energy"][0], 1.0e5 * u.GeV)
     assert u.isclose(table["energy"][-1], last_energy * u.GeV)
@@ -143,8 +162,7 @@ def test_kuznetsov_petrov_savchenko_2026_exports(model_id, n_points, last_energy
     ],
 )
 def test_kuznetsov_petrov_savchenko_2026_does_not_expose_negative_spline_tail(model_id, outside_energy):
-    model = get_model(model_id)
-    value = model.evaluate(outside_energy * u.GeV)
+    value = get_model(model_id).evaluate(outside_energy * u.GeV)
     assert np.isnan(value.value)
 
 
@@ -156,11 +174,29 @@ def test_kuznetsov_petrov_savchenko_2026_does_not_expose_negative_spline_tail(mo
     ],
 )
 def test_yoshida_meier_2026_digitized_curves(model_id, n_points, first_energy, last_energy, peak_energy, peak_flux):
-    model = get_model(model_id)
-    table = model.load_e2phi()
+    table = get_model(model_id).load_e2phi()
     flux_unit = u.GeV / (u.cm**2 * u.s * u.sr)
     peak = int(np.argmax(table["E2phi"]))
+    assert len(table) == n_points
+    assert table.meta["flavor_convention"] == "all_flavor"
+    assert u.isclose(table["energy"][0], first_energy * u.GeV, rtol=1e-12)
+    assert u.isclose(table["energy"][-1], last_energy * u.GeV, rtol=1e-12)
+    assert u.isclose(table["energy"][peak], peak_energy * u.GeV, rtol=1e-12)
+    assert u.isclose(table["E2phi"][peak], peak_flux * flux_unit, rtol=1e-12)
 
+
+@pytest.mark.parametrize(
+    ("model_id", "n_points", "first_energy", "last_energy", "peak_energy", "peak_flux"),
+    [
+        ("neutrino.cosmogenic.allard_2026_frii_model1", 32, 9.999999999899e6, 1.122035087006e10, 3.548011155272e8, 2.274689424354e-10),
+        ("neutrino.cosmogenic.allard_2026_frii_model2", 38, 9.999999999899e6, 4.466813847379e10, 5.623552202520e8, 1.173410602754e-9),
+        ("neutrino.cosmogenic.allard_2026_frii_model3", 42, 9.999999999899e6, 1.000000000007e11, 8.911496416365e8, 3.491937361040e-9),
+    ],
+)
+def test_allard_2026_digitized_curves(model_id, n_points, first_energy, last_energy, peak_energy, peak_flux):
+    table = get_model(model_id).load_e2phi()
+    flux_unit = u.GeV / (u.cm**2 * u.s * u.sr)
+    peak = int(np.argmax(table["E2phi"]))
     assert len(table) == n_points
     assert table.meta["flavor_convention"] == "all_flavor"
     assert u.isclose(table["energy"][0], first_energy * u.GeV, rtol=1e-12)
@@ -174,8 +210,11 @@ def test_yoshida_meier_2026_digitized_curves(model_id, n_points, first_energy, l
     [
         ("neutrino.cosmogenic.yoshida_meier_2026_no_evolution", 3.0e8),
         ("neutrino.cosmogenic.yoshida_meier_2026_log_normal", 3.0e8),
+        ("neutrino.cosmogenic.allard_2026_frii_model1", 2.0e10),
+        ("neutrino.cosmogenic.allard_2026_frii_model2", 6.0e10),
+        ("neutrino.cosmogenic.allard_2026_frii_model3", 2.0e11),
     ],
 )
-def test_yoshida_meier_2026_does_not_extrapolate(model_id, outside_energy):
+def test_recent_digitized_cosmogenic_models_do_not_extrapolate(model_id, outside_energy):
     value = get_model(model_id).evaluate(outside_energy * u.GeV)
     assert np.isnan(value.value)

@@ -1,8 +1,6 @@
 from maham._core.metadata import DataSource, ModelMetadata, ProvenanceType, Reference, StorageMode
 from maham.models.flux.neutrino.base import TabulatedNeutrinoFluxModel
 from maham.models.registry import register_model
-
-
 _RELEASE = Reference(
     title="Data for the KM3-230213A high energy event observation",
     authors=("KM3NeT Collaboration",),
@@ -10,24 +8,20 @@ _RELEASE = Reference(
     doi="10.5281/zenodo.14860165",
     url="https://zenodo.org/records/14860165",
 )
-
 _KPS_REPOSITORY = Reference(
     title="KM3-230213A_UHECR_TA: code and simulation data for Ultra-High Energy Event KM3-230213A as a Cosmogenic Neutrino in Light of Minimal UHECR Flux Models",
     authors=("M. Yu. Kuznetsov", "N. A. Petrov", "Y. S. Savchenko"),
     year=2025,
     url="https://github.com/82492749123082/KM3-230213A_UHECR_TA",
 )
-
 _ENERGY_COLUMN = "Energy [GeV]"
 _VALUE_COLUMN = "log10(E^2 F(E) [GeV.cm^-2.s^-1.sr^-1])"
 _ROOT = "data/models/flux/neutrino/cosmogenic"
-
 
 class _CosmogenicModel(TabulatedNeutrinoFluxModel):
     energy_column = _ENERGY_COLUMN
     value_column = _VALUE_COLUMN
     values_are_log10 = True
-
 
 class _KPSCosmogenicModel(TabulatedNeutrinoFluxModel):
     energy_column = "Energy"
@@ -35,12 +29,15 @@ class _KPSCosmogenicModel(TabulatedNeutrinoFluxModel):
     values_are_log10 = False
     nonpositive_flux_policy = "truncate_at_first"
 
-
 class _YoshidaMeier2026CosmogenicModel(TabulatedNeutrinoFluxModel):
     energy_column = "Energy"
     value_column = "FluxE2"
     values_are_log10 = False
 
+class _Allard2026FRIICosmogenicModel(TabulatedNeutrinoFluxModel):
+    energy_column = "Energy"
+    value_column = "FluxE2"
+    values_are_log10 = False
 
 def _metadata(model_id, title, filename, sha256, year, paper_title, authors, arxiv, doi, variant=None, extra_notes=()):
     return ModelMetadata(
@@ -69,7 +66,6 @@ def _metadata(model_id, title, filename, sha256, year, paper_title, authors, arx
         ),
         tags=("neutrino", "cosmogenic", "UHECR", "KM3NeT-curated"),
     )
-
 
 def _kps_metadata(model_id, title, filename, sha256, variant, support_note, extra_notes=()):
     return ModelMetadata(
@@ -109,7 +105,6 @@ def _kps_metadata(model_id, title, filename, sha256, variant, support_note, extr
         ),
         tags=("neutrino", "cosmogenic", "UHECR", "Telescope Array", "KM3-230213A", "derived"),
     )
-
 
 
 def _yoshida_meier_metadata(model_id, title, filename, sha256, variant, extra_notes=()):
@@ -154,6 +149,49 @@ def _yoshida_meier_metadata(model_id, title, filename, sha256, variant, extra_no
     )
 
 
+def _allard_2026_metadata(model_id, title, filename, sha256, variant, emax_ref):
+    return ModelMetadata(
+        id=model_id,
+        title=title,
+        messenger="neutrino",
+        model_type="flux",
+        family="cosmogenic",
+        description="Diffuse cosmogenic neutrino flux from a self-consistent population model of UHECR-accelerating FRII radio galaxies.",
+        year=2026,
+        variant=variant,
+        source=DataSource(provenance=ProvenanceType.DIGITIZED, storage=StorageMode.BUNDLED, path=f"{_ROOT}/{filename}", sha256=sha256),
+        paper=Reference(
+            title="Cosmogenic neutrinos from FRII galaxies as potential origin of the ultra-high-energy KM3-230213A event",
+            authors=("Denis Allard", "Bruny Baret", "Noemie Globus", "Etienne Parizot"),
+            year=2026,
+            url="https://arxiv.org/abs/2608.16540",
+        ),
+        data_reference=Reference(
+            title="Figure 4 of arXiv:2608.16540v1",
+            authors=("Denis Allard", "Bruny Baret", "Noemie Globus", "Etienne Parizot"),
+            year=2026,
+            url="https://arxiv.org/abs/2608.16540",
+        ),
+        quantity="E2phi",
+        spectral_kind="differential_intensity",
+        energy_unit="GeV",
+        value_unit="GeV / (cm2 s sr)",
+        flavor_convention="all_flavor",
+        solid_angle_convention="diffuse",
+        notes=(
+            "Numerical curve was extracted from the vector content of the top-left panel of Figure 4 in arXiv:2608.16540v1 because no machine-readable flux table was identified.",
+            "The source PDF has SHA256 7e4c321c2cd6ae3a7803dd4523bbebc55f05c68479e3eac969e5100e2f27b726.",
+            "The Figure 4 flavor convention is not explicitly labeled; MAHAM stores the curve as all-flavor because its normalization and direct comparison with the KM3-230213A flux are consistent with the all-flavor convention used in MAHAM comparison products.",
+            f"Reference maximum proton energy at Lkin=1e47 erg/s: Emax_ref={emax_ref}.",
+            "The injected UHECR spectrum is proportional to E^-2 exp(-E/Emax), and the reference calculation assumes a purely protonic UHECR composition.",
+            "Diffuse fluxes are averaged over 1000 FRII population realizations extending to z=6.",
+            "The reference normalization adopts the proton-dominated limit epsilon_cr=4/7; predicted fluxes scale linearly with epsilon_cr.",
+            "Photomeson production is modeled with SOPHIA and the EBL with Gilmore et al. (2012); the diffuse calculation neglects the extragalactic magnetic field.",
+            "MAHAM does not extrapolate beyond the digitized energy support.",
+        ),
+        tags=("neutrino", "cosmogenic", "UHECR", "FRII", "radio galaxy", "KM3-230213A", "digitized"),
+    )
+
 @register_model
 class Aloisio2015Cosmogenic(_CosmogenicModel):
     metadata = _metadata(
@@ -163,7 +201,6 @@ class Aloisio2015Cosmogenic(_CosmogenicModel):
         ("R. Aloisio", "D. Boncioli", "A. di Matteo", "A. F. Grillo", "S. Petrera", "F. Salamida"),
         "1505.04020", "10.1088/1475-7516/2015/10/006",
     )
-
 
 @register_model
 class Berat2024Cosmogenic(_CosmogenicModel):
@@ -175,7 +212,6 @@ class Berat2024Cosmogenic(_CosmogenicModel):
         "2402.04759", "10.3847/1538-4357/ad372a",
     )
 
-
 @register_model
 class Boncioli2019Cosmogenic(_CosmogenicModel):
     metadata = _metadata(
@@ -186,7 +222,6 @@ class Boncioli2019Cosmogenic(_CosmogenicModel):
         variant="cosmogenic component",
     )
 
-
 @register_model
 class Condorelli2023Cosmogenic(_CosmogenicModel):
     metadata = _metadata(
@@ -196,7 +231,6 @@ class Condorelli2023Cosmogenic(_CosmogenicModel):
         ("Antonio Condorelli", "Denise Boncioli", "Enrico Peretti", "Sergio Petrera"),
         "2209.08593", "10.1103/PhysRevD.107.083009",
     )
-
 
 @register_model
 class Ehlert2024Cosmogenic(_CosmogenicModel):
@@ -210,7 +244,6 @@ class Ehlert2024Cosmogenic(_CosmogenicModel):
         extra_notes=("The KM3NeT-curated tabulation contains one duplicate energy coordinate; MAHAM collapses it by averaging the two native log10(E2phi) values before conversion to linear flux.",),
     )
 
-
 @register_model
 class MuzioFarrar2023Cosmogenic(_CosmogenicModel):
     metadata = _metadata(
@@ -219,7 +252,6 @@ class MuzioFarrar2023Cosmogenic(_CosmogenicModel):
         "Constraints on the hosts of UHECR accelerators", ("Marco Stein Muzio", "Glennys R. Farrar"),
         "2209.08068", "10.3847/2041-8213/acac93",
     )
-
 
 @register_model
 class MuzioUngerWissel2023Cosmogenic(_CosmogenicModel):
@@ -232,7 +264,6 @@ class MuzioUngerWissel2023Cosmogenic(_CosmogenicModel):
         "2303.04170", "10.1103/PhysRevD.107.103030",
     )
 
-
 @register_model
 class Auger2023Cosmogenic(_CosmogenicModel):
     metadata = _metadata(
@@ -241,7 +272,6 @@ class Auger2023Cosmogenic(_CosmogenicModel):
         "Constraining the sources of ultra-high-energy cosmic rays across and above the ankle with the spectrum and composition data measured at the Pierre Auger Observatory",
         ("Pierre Auger Collaboration",), "2211.02857", "10.1088/1475-7516/2023/05/024",
     )
-
 
 @register_model
 class Heinze2019Cosmogenic(_CosmogenicModel):
@@ -253,7 +283,6 @@ class Heinze2019Cosmogenic(_CosmogenicModel):
         "1901.03338", "10.3847/1538-4357/ab05ce",
     )
 
-
 @register_model
 class ZhangMurase2019Cosmogenic(_CosmogenicModel):
     metadata = _metadata(
@@ -263,7 +292,6 @@ class ZhangMurase2019Cosmogenic(_CosmogenicModel):
         ("B. Theodore Zhang", "Kohta Murase"), "1812.10289", "10.1103/PhysRevD.100.103004",
         variant="cosmogenic component",
     )
-
 
 @register_model
 class KuznetsovPetrovSavchenko2026BestFitCosmogenic(_KPSCosmogenicModel):
@@ -277,7 +305,6 @@ class KuznetsovPetrovSavchenko2026BestFitCosmogenic(_KPSCosmogenicModel):
         extra_notes=("Source configuration: Rmax=182 EeV, spectral slope -2.06, injected composition 99.2% He and 0.8% Fe.",),
     )
 
-
 @register_model
 class KuznetsovPetrovSavchenko2026LocalMinCosmogenic(_KPSCosmogenicModel):
     metadata = _kps_metadata(
@@ -289,8 +316,6 @@ class KuznetsovPetrovSavchenko2026LocalMinCosmogenic(_KPSCosmogenicModel):
         "The leading positive support contains 787 points from 1e5 to 3.217e10 GeV.",
         extra_notes=("Source configuration: Rmax=15.8 EeV, spectral slope -0.78, injected composition 97.1% protons and 2.9% Fe.",),
     )
-
-
 @register_model
 class YoshidaMeier2026NoEvolutionCosmogenic(_YoshidaMeier2026CosmogenicModel):
     metadata = _yoshida_meier_metadata(
@@ -302,7 +327,6 @@ class YoshidaMeier2026NoEvolutionCosmogenic(_YoshidaMeier2026CosmogenicModel):
         extra_notes=("The baseline source density is n0=1e-5 Mpc^-3.",),
     )
 
-
 @register_model
 class YoshidaMeier2026LogNormalCosmogenic(_YoshidaMeier2026CosmogenicModel):
     metadata = _yoshida_meier_metadata(
@@ -312,4 +336,28 @@ class YoshidaMeier2026LogNormalCosmogenic(_YoshidaMeier2026CosmogenicModel):
         "4a78c22a8a9a0fa40f307e3db5ac9802bbc84b97599dbad64b1f209991d0a40b",
         "log-normal source-density evolution",
         extra_notes=("The source-density evolution follows the log-normal high-redshift evolution considered in the paper.",),
+    )
+
+@register_model
+class Allard2026FRIIModel1Cosmogenic(_Allard2026FRIICosmogenicModel):
+    metadata = _allard_2026_metadata(
+        "neutrino.cosmogenic.allard_2026_frii_model1", "Allard et al. 2026 FRII cosmogenic neutrino flux: model 1",
+        "allard_2026_frii_model1.csv", "0ca731fb005023d1242f333d9e9ddb6eae68c8f7ed9b5dd43b90d3999c45986d",
+        "FRII model 1", "3e19 eV",
+    )
+
+@register_model
+class Allard2026FRIIModel2Cosmogenic(_Allard2026FRIICosmogenicModel):
+    metadata = _allard_2026_metadata(
+        "neutrino.cosmogenic.allard_2026_frii_model2", "Allard et al. 2026 FRII cosmogenic neutrino flux: model 2",
+        "allard_2026_frii_model2.csv", "7cf9eb5a9341ba32a6a1c270d54f54c41b1fc60433e0b5a678440e7e205d5615",
+        "FRII model 2", "1e20 eV",
+    )
+
+@register_model
+class Allard2026FRIIModel3Cosmogenic(_Allard2026FRIICosmogenicModel):
+    metadata = _allard_2026_metadata(
+        "neutrino.cosmogenic.allard_2026_frii_model3", "Allard et al. 2026 FRII cosmogenic neutrino flux: model 3",
+        "allard_2026_frii_model3.csv", "94627af4958f7cd807a1320e97b536f207cfeaddab00c140355219e9551be7b4",
+        "FRII model 3", "3e20 eV",
     )
