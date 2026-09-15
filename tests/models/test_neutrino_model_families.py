@@ -7,9 +7,9 @@ from maham.models.flux.neutrino import family_envelope
 def test_cosmogenic_family_envelope():
     table = family_envelope("cosmogenic")
     assert table.meta["family"] == "cosmogenic"
-    assert len(table.meta["model_ids"]) == 10
+    assert len(table.meta["model_ids"]) == 12
     assert np.max(table["n_models"]) > 1
-    assert np.max(table["n_models"]) <= 10
+    assert np.max(table["n_models"]) <= 12
     assert np.all(table["E2phi_lower"][table["n_models"] > 0] <= table["E2phi_upper"][table["n_models"] > 0])
 
 

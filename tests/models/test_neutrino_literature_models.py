@@ -16,6 +16,8 @@ COSMOGENIC = {
     "neutrino.cosmogenic.auger_2023": 65,
     "neutrino.cosmogenic.heinze_2019": 22,
     "neutrino.cosmogenic.zhang_murase_2019": 72,
+    "neutrino.cosmogenic.kuznetsov_petrov_savchenko_2026_best_fit": 919,
+    "neutrino.cosmogenic.kuznetsov_petrov_savchenko_2026_local_min": 787,
 }
 
 SOURCE_ENVIRONMENT = {
@@ -27,6 +29,11 @@ SOURCE_ENVIRONMENT = {
     "neutrino.source_environment.tamborra_llgrb_2015": 86,
     "neutrino.source_environment.tamborra_sgrb_2015": 77,
     "neutrino.source_environment.winter_tde_2023": 75,
+}
+
+DERIVED_COSMOGENIC = {
+    "neutrino.cosmogenic.kuznetsov_petrov_savchenko_2026_best_fit",
+    "neutrino.cosmogenic.kuznetsov_petrov_savchenko_2026_local_min",
 }
 
 
@@ -47,7 +54,7 @@ def test_literature_model_native_data(model_id, n_points):
 
 def test_cosmogenic_registry_membership():
     models = list_models(messenger="neutrino", model_type="flux", family="cosmogenic")
-    assert len(models) == 10
+    assert len(models) == 12
     assert {model.id for model in models} == set(COSMOGENIC)
 
 
@@ -57,13 +64,21 @@ def test_source_environment_registry_membership():
     assert {model.id for model in models} == set(SOURCE_ENVIRONMENT)
 
 
-@pytest.mark.parametrize("family", ("cosmogenic", "source_environment"))
-def test_family_models_have_curated_provenance(family):
-    models = list_models(messenger="neutrino", model_type="flux", family=family)
+def test_km3net_curated_models_have_curated_provenance():
+    model_ids = (set(COSMOGENIC) - DERIVED_COSMOGENIC) | set(SOURCE_ENVIRONMENT)
 
-    for model in models:
-        assert model.source.provenance.value == "curated_database"
-        assert model.data_reference.doi == "10.5281/zenodo.14860165"
+    for model_id in model_ids:
+        model = get_model(model_id)
+        assert model.metadata.source.provenance.value == "curated_database"
+        assert model.metadata.data_reference.doi == "10.5281/zenodo.14860165"
+
+
+@pytest.mark.parametrize("model_id", sorted(DERIVED_COSMOGENIC))
+def test_recent_cosmogenic_models_have_derived_provenance(model_id):
+    model = get_model(model_id)
+    assert model.metadata.source.provenance.value == "derived"
+    assert model.metadata.paper.doi == "10.1134/S0021364025610061"
+    assert model.metadata.data_reference.url == "https://github.com/82492749123082/KM3-230213A_UHECR_TA"
 
 
 def test_literature_model_all_flavor_conversion():
@@ -81,3 +96,35 @@ def test_ehlert_duplicate_energy_is_collapsed_in_native_log_space():
     assert len(index) == 1
     expected = 10.0 ** ((-10.8373857391 - 10.6597490987) / 2.0) * u.GeV / (u.cm**2 * u.s * u.sr)
     assert u.isclose(table["E2phi"][index[0]], expected, rtol=1e-12)
+
+
+@pytest.mark.parametrize(
+    ("model_id", "n_points", "last_energy", "first_flux", "last_flux"),
+    [
+        ("neutrino.cosmogenic.kuznetsov_petrov_savchenko_2026_best_fit", 919, 2.707e11, 4.369e-12, 2.052e-16),
+        ("neutrino.cosmogenic.kuznetsov_petrov_savchenko_2026_local_min", 787, 3.217e10, 3.547e-13, 2.481e-14),
+    ],
+)
+def test_kuznetsov_petrov_savchenko_2026_exports(model_id, n_points, last_energy, first_flux, last_flux):
+    model = get_model(model_id)
+    table = model.load_e2phi()
+    flux_unit = u.GeV / (u.cm**2 * u.s * u.sr)
+
+    assert len(table) == n_points
+    assert u.isclose(table["energy"][0], 1.0e5 * u.GeV)
+    assert u.isclose(table["energy"][-1], last_energy * u.GeV)
+    assert u.isclose(table["E2phi"][0], first_flux * flux_unit, rtol=1e-12)
+    assert u.isclose(table["E2phi"][-1], last_flux * flux_unit, rtol=1e-12)
+
+
+@pytest.mark.parametrize(
+    ("model_id", "outside_energy"),
+    [
+        ("neutrino.cosmogenic.kuznetsov_petrov_savchenko_2026_best_fit", 2.751e11),
+        ("neutrino.cosmogenic.kuznetsov_petrov_savchenko_2026_local_min", 3.270e10),
+    ],
+)
+def test_kuznetsov_petrov_savchenko_2026_does_not_expose_negative_spline_tail(model_id, outside_energy):
+    model = get_model(model_id)
+    value = model.evaluate(outside_energy * u.GeV)
+    assert np.isnan(value.value)

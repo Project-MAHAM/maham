@@ -174,6 +174,8 @@ MAHAM/
 │       │   │   │       │   ├── condorelli_2023.json
 │       │   │   │       │   ├── ehlert_2024.json
 │       │   │   │       │   ├── heinze_2019.json
+│       │   │   │       │   ├── kuznetsov_petrov_savchenko_2026_best_fit.csv
+│       │   │   │       │   ├── kuznetsov_petrov_savchenko_2026_local_min.csv
 │       │   │   │       │   ├── muzio_farrar_2023.json
 │       │   │   │       │   ├── muzio_unger_wissel_2023.json
 │       │   │   │       │   └── zhang_murase_2019.json
@@ -353,13 +355,14 @@ MAHAM supports three storage modes.
 
 ### BUNDLED
 
-Small curated, transcribed, digitized, or otherwise reproducibility-critical data distributed with the package.
+Small curated, transcribed, digitized, derived, or otherwise reproducibility-critical data distributed with the package.
 
 Examples:
 
 - IceCube 9.5-year through-going muon piece-wise flux
 - Telescope Array combined-spectrum digitization
 - KM3NeT-curated cosmogenic and source-environment neutrino model curves
+- Reproducibly derived literature-model tables preserved with pinned provenance and checksums
 
 ### REMOTE
 
@@ -397,7 +400,7 @@ A single scientific publication may produce more than one MAHAM object. For exam
 
 Models and datasets are also kept conceptually distinct. A model represents a named theoretical or phenomenological prediction. A dataset represents an observational, experimental, or released scientific product.
 
-Bundled source tables should preserve the source values and be protected by checksums where appropriate. Standardization required for MAHAM's numerical interfaces, such as energy ordering, belongs in the loader rather than in silent modification of the bundled source file.
+Bundled source tables should preserve the source values and be protected by checksums where appropriate. Standardization required for MAHAM's numerical interfaces, such as energy ordering, duplicate-energy handling, or restriction to a physically valid support, belongs in the loader rather than in silent modification of the bundled source file. Model-specific standardization must be explicit, documented in metadata, and covered by tests.
 
 ## Spectral representation
 

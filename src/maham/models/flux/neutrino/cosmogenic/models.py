@@ -11,6 +11,13 @@ _RELEASE = Reference(
     url="https://zenodo.org/records/14860165",
 )
 
+_KPS_REPOSITORY = Reference(
+    title="KM3-230213A_UHECR_TA: code and simulation data for Ultra-High Energy Event KM3-230213A as a Cosmogenic Neutrino in Light of Minimal UHECR Flux Models",
+    authors=("M. Yu. Kuznetsov", "N. A. Petrov", "Y. S. Savchenko"),
+    year=2025,
+    url="https://github.com/82492749123082/KM3-230213A_UHECR_TA",
+)
+
 _ENERGY_COLUMN = "Energy [GeV]"
 _VALUE_COLUMN = "log10(E^2 F(E) [GeV.cm^-2.s^-1.sr^-1])"
 _ROOT = "data/models/flux/neutrino/cosmogenic"
@@ -20,6 +27,13 @@ class _CosmogenicModel(TabulatedNeutrinoFluxModel):
     energy_column = _ENERGY_COLUMN
     value_column = _VALUE_COLUMN
     values_are_log10 = True
+
+
+class _KPSCosmogenicModel(TabulatedNeutrinoFluxModel):
+    energy_column = "Energy"
+    value_column = "FluxE2"
+    values_are_log10 = False
+    nonpositive_flux_policy = "truncate_at_first"
 
 
 def _metadata(model_id, title, filename, sha256, year, paper_title, authors, arxiv, doi, variant=None, extra_notes=()):
@@ -48,6 +62,46 @@ def _metadata(model_id, title, filename, sha256, year, paper_title, authors, arx
             *extra_notes,
         ),
         tags=("neutrino", "cosmogenic", "UHECR", "KM3NeT-curated"),
+    )
+
+
+def _kps_metadata(model_id, title, filename, sha256, variant, support_note, extra_notes=()):
+    return ModelMetadata(
+        id=model_id,
+        title=title,
+        messenger="neutrino",
+        model_type="flux",
+        family="cosmogenic",
+        description="Cosmogenic neutrino flux prediction from minimal Telescope Array UHECR models, reproduced from the authors' public analysis code.",
+        year=2026,
+        variant=variant,
+        source=DataSource(provenance=ProvenanceType.DERIVED, storage=StorageMode.BUNDLED, path=f"{_ROOT}/{filename}", sha256=sha256),
+        paper=Reference(
+            title="Ultra-High Energy Event KM3-230213A as a Cosmogenic Neutrino in Light of Minimal UHECR Flux Models",
+            authors=("M. Yu. Kuznetsov", "N. A. Petrov", "Y. S. Savchenko"),
+            year=2026,
+            doi="10.1134/S0021364025610061",
+            url="https://arxiv.org/abs/2509.09590",
+        ),
+        data_reference=_KPS_REPOSITORY,
+        quantity="E2phi",
+        spectral_kind="differential_intensity",
+        energy_unit="GeV",
+        value_unit="GeV / (cm2 s sr)",
+        flavor_convention="per_flavor",
+        solid_angle_convention="diffuse",
+        notes=(
+            "Numerical table was reproduced from the authors' public repository at commit 774174d9faaa5df40b67af5fa42b4191f09d38c6 by running papermain.py.",
+            "The authors' calc_fluxes() CSV output is preserved byte-for-byte after renaming for MAHAM.",
+            "The export uses the z<4 CRPropa model normalized to the Telescope Array spectrum and samples a smoothing spline at 1000 log-spaced energies from 1e5 to 1e12 GeV.",
+            "Native representation is per-flavor E2phi for nu+nubar under neutrino equipartition.",
+            "The authors' high-energy smoothing spline becomes non-positive and later oscillates around zero; these values are nonphysical and incompatible with log-log flux interpolation.",
+            support_note,
+            "MAHAM therefore restricts the standardized support to the leading contiguous positive part of the unchanged source export.",
+            "MAHAM does not extrapolate beyond this standardized positive support.",
+            *extra_notes,
+        ),
+        tags=("neutrino", "cosmogenic", "UHECR", "Telescope Array", "KM3-230213A", "derived"),
     )
 
 
@@ -159,4 +213,30 @@ class ZhangMurase2019Cosmogenic(_CosmogenicModel):
         "Ultrahigh-energy cosmic-ray nuclei and neutrinos from engine-driven supernovae",
         ("B. Theodore Zhang", "Kohta Murase"), "1812.10289", "10.1103/PhysRevD.100.103004",
         variant="cosmogenic component",
+    )
+
+
+@register_model
+class KuznetsovPetrovSavchenko2026BestFitCosmogenic(_KPSCosmogenicModel):
+    metadata = _kps_metadata(
+        "neutrino.cosmogenic.kuznetsov_petrov_savchenko_2026_best_fit",
+        "Kuznetsov, Petrov and Savchenko 2026 cosmogenic neutrino flux: best fit",
+        "kuznetsov_petrov_savchenko_2026_best_fit.csv",
+        "163f0d1ce47d77eafd3797a4e16f24587d9d283a4f5fabef44a48f08db71e2e0",
+        "best-fit Telescope Array UHECR solution",
+        "The leading positive support contains 919 points from 1e5 to 2.707e11 GeV.",
+        extra_notes=("Source configuration: Rmax=182 EeV, spectral slope -2.06, injected composition 99.2% He and 0.8% Fe.",),
+    )
+
+
+@register_model
+class KuznetsovPetrovSavchenko2026LocalMinCosmogenic(_KPSCosmogenicModel):
+    metadata = _kps_metadata(
+        "neutrino.cosmogenic.kuznetsov_petrov_savchenko_2026_local_min",
+        "Kuznetsov, Petrov and Savchenko 2026 cosmogenic neutrino flux: local minimum",
+        "kuznetsov_petrov_savchenko_2026_local_min.csv",
+        "141a9dce1707a8ce112ede580523a5c0bd070eed9bac1916a66f63a9c3853c7a",
+        "local-minimum Telescope Array UHECR solution",
+        "The leading positive support contains 787 points from 1e5 to 3.217e10 GeV.",
+        extra_notes=("Source configuration: Rmax=15.8 EeV, spectral slope -0.78, injected composition 97.1% protons and 2.9% Fe.",),
     )

@@ -115,6 +115,7 @@ class TabulatedNeutrinoFluxModel(NeutrinoFluxModel):
     value_column: str | None = None
     values_are_log10: bool = False
     duplicate_energy_policy: str = "error"
+    nonpositive_flux_policy: str = "error"
 
     def load_native(self, cache: bool = True, show_progress: bool = True) -> QTable:
         if self.energy_column is None or self.value_column is None:
@@ -126,7 +127,7 @@ class TabulatedNeutrinoFluxModel(NeutrinoFluxModel):
         if path.suffix.lower() == ".json":
             frame = pd.read_json(path)
         elif path.suffix.lower() == ".csv":
-            frame = pd.read_csv(path)
+            frame = pd.read_csv(path, comment="#")
         else:
             raise ValueError(f"Unsupported tabulated model format for '{self.id}': {path.suffix}")
 
@@ -136,8 +137,11 @@ class TabulatedNeutrinoFluxModel(NeutrinoFluxModel):
         energy = energy[order]
         values = values[order]
         energy, values = self._resolve_duplicate_energies(energy, values)
+
         if self.values_are_log10:
             values = 10.0**values
+
+        energy, values = self._resolve_nonpositive_flux(energy, values)
 
         quantity = self._native_quantity()
         table = QTable()
@@ -156,3 +160,16 @@ class TabulatedNeutrinoFluxModel(NeutrinoFluxModel):
         counts = np.bincount(inverse)
         mean_values = np.bincount(inverse, weights=values) / counts
         return unique_energy, mean_values
+
+    def _resolve_nonpositive_flux(self, energy: np.ndarray, values: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+        bad = np.flatnonzero(values <= 0)
+        if len(bad) == 0:
+            return energy, values
+        if self.nonpositive_flux_policy == "error":
+            return energy, values
+        if self.nonpositive_flux_policy != "truncate_at_first":
+            raise ValueError(f"Unsupported nonpositive_flux_policy for '{self.id}': {self.nonpositive_flux_policy}")
+        stop = int(bad[0])
+        if stop < 2:
+            raise ValueError(f"Tabulated model '{self.id}' has fewer than two positive points before its first non-positive flux value.")
+        return energy[:stop], values[:stop]
