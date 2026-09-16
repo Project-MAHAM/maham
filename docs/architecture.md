@@ -90,11 +90,16 @@ MAHAM/
 │       │   │   │   │   └── models.py
 │       │   │   │   └── source_environment/
 │       │   │   │       ├── __init__.py
+│       │   │   │       ├── km3net_blazar_2026.py
 │       │   │   │       └── models.py
 │       │   │   ├── cosmic_ray/
 │       │   │   │   └── __init__.py
 │       │   │   └── gamma_ray/
-│       │   │       └── __init__.py
+│       │   │       ├── __init__.py
+│       │   │       ├── base.py
+│       │   │       └── source_environment/
+│       │   │           ├── __init__.py
+│       │   │           └── models.py
 │       │   ├── cross_sections/
 │       │   │   └── __init__.py
 │       │   ├── sources/
@@ -117,6 +122,7 @@ MAHAM/
 │       │   │   │   ├── base.py
 │       │   │   │   ├── icecube_glashow_2021.py
 │       │   │   │   ├── icecube_combined_2015.py
+│       │   │   │   ├── icecube_cascade_2020.py
 │       │   │   │   ├── icecube_throughgoing_muon_2022.py
 │       │   │   │   ├── icecube_ngc1068_2022.py
 │       │   │   │   ├── icecube_txs0506_flare_2018.py
@@ -164,40 +170,44 @@ MAHAM/
 │       ├── data/
 │       │   ├── models/
 │       │   │   ├── README.md
-│       │   │   ├── flux/
-│       │   │   │   └── neutrino/
-│       │   │   │       ├── cosmogenic/
-│       │   │   │       │   ├── aloisio_2015.json
-│       │   │   │       │   ├── auger_2023.json
-│       │   │   │       │   ├── berat_2024.json
-│       │   │   │       │   ├── boncioli_2019.json
-│       │   │   │       │   ├── condorelli_2023.json
-│       │   │   │       │   ├── ehlert_2024.json
-│       │   │   │       │   ├── heinze_2019.json
-│       │   │   │       │   ├── kuznetsov_petrov_savchenko_2026_best_fit.csv
-│       │   │   │       │   ├── kuznetsov_petrov_savchenko_2026_local_min.csv
-│       │   │   │       │   ├── muzio_farrar_2023.json
-│       │   │   │       │   ├── muzio_unger_wissel_2023.json
-│       │   │   │       │   ├── yoshida_meier_2026_log_normal.csv
-│       │   │   │       │   ├── yoshida_meier_2026_no_evolution.csv
-│       │   │   │       │   └── zhang_murase_2019.json
-│       │   │   │       └── source_environment/
-│       │   │   │           ├── boncioli_llgrb_2019.json
-│       │   │   │           ├── fang_pulsar_2014.json
-│       │   │   │           ├── rodrigues_agn_2021.json
-│       │   │   │           ├── rodrigues_bllac_2024.json
-│       │   │   │           ├── rodrigues_fsrq_2024.json
-│       │   │   │           ├── tamborra_llgrb_2015.json
-│       │   │   │           ├── tamborra_sgrb_2015.json
-│       │   │   │           └── winter_tde_2023.json
-│       │   │   ├── cross_sections/
-│       │   │   ├── sources/
-│       │   │   ├── attenuation/
-│       │   │   ├── backgrounds/
-│       │   │   └── populations/
+│       │   │   └── flux/
+│       │   │       ├── gamma_ray/
+│       │   │       │   └── source_environment/
+│       │   │       │       ├── ajello_blazar_population_2015.csv
+│       │   │       │       └── km3net_blazar_population_2026_gamma_best_fit.csv
+│       │   │       └── neutrino/
+│       │   │           ├── cosmogenic/
+│       │   │           │   ├── allard_2026_frii_model1.csv
+│       │   │           │   ├── allard_2026_frii_model2.csv
+│       │   │           │   ├── allard_2026_frii_model3.csv
+│       │   │           │   ├── aloisio_2015.json
+│       │   │           │   ├── auger_2023.json
+│       │   │           │   ├── berat_2024.json
+│       │   │           │   ├── boncioli_2019.json
+│       │   │           │   ├── condorelli_2023.json
+│       │   │           │   ├── ehlert_2024.json
+│       │   │           │   ├── heinze_2019.json
+│       │   │           │   ├── kuznetsov_petrov_savchenko_2026_best_fit.csv
+│       │   │           │   ├── kuznetsov_petrov_savchenko_2026_local_min.csv
+│       │   │           │   ├── muzio_farrar_2023.json
+│       │   │           │   ├── muzio_unger_wissel_2023.json
+│       │   │           │   ├── yoshida_meier_2026_log_normal.csv
+│       │   │           │   ├── yoshida_meier_2026_no_evolution.csv
+│       │   │           │   └── zhang_murase_2019.json
+│       │   │           └── source_environment/
+│       │   │               ├── boncioli_llgrb_2019.json
+│       │   │               ├── fang_pulsar_2014.json
+│       │   │               ├── km3net_blazar_population_2026_best_fit.csv
+│       │   │               ├── rodrigues_agn_2021.json
+│       │   │               ├── rodrigues_bllac_2024.json
+│       │   │               ├── rodrigues_fsrq_2024.json
+│       │   │               ├── tamborra_llgrb_2015.json
+│       │   │               ├── tamborra_sgrb_2015.json
+│       │   │               └── winter_tde_2023.json
 │       │   └── datasets/
 │       │       ├── spectra/
 │       │       │   ├── neutrino/
+│       │       │   │   ├── icecube_cascade_piecewise_2020.csv
 │       │       │   │   ├── icecube_throughgoing_muon_piecewise_2022.csv
 │       │       │   │   ├── icecube_ngc1068_flux_2022.csv
 │       │       │   │   └── icecube_txs0506_flare_flux_2018.csv
@@ -243,13 +253,15 @@ MAHAM/
 │   │   ├── test_neutrino_flux.py
 │   │   ├── test_neutrino_ensemble.py
 │   │   ├── test_neutrino_literature_models.py
-│   │   └── test_neutrino_model_families.py
+│   │   ├── test_neutrino_model_families.py
+│   │   └── test_gamma_ray_literature_models.py
 │   ├── datasets/
 │   │   ├── test_base.py
 │   │   ├── test_registry.py
 │   │   ├── test_icecube_glashow.py
 │   │   ├── test_icecube_ehe_2025.py
 │   │   ├── test_icecube_combined_2015.py
+│   │   ├── test_icecube_cascade_2020.py
 │   │   ├── test_icecube_throughgoing_muon_2022.py
 │   │   ├── test_icecube_ngc1068_2022.py
 │   │   ├── test_icecube_txs0506_flare_2018.py
@@ -276,6 +288,11 @@ MAHAM/
 │   │   └── km3net/
 │   └── comparisons/
 │       ├── diffuse_spectra/
+│       │   ├── README.md
+│       │   ├── compare.py
+│       │   └── outputs/
+│       │       └── .gitignore
+│       ├── model_spectra/
 │       │   ├── README.md
 │       │   ├── compare.py
 │       │   └── outputs/
@@ -366,6 +383,7 @@ Examples:
 - KM3NeT-curated cosmogenic and source-environment neutrino model curves
 - Reproducibly derived literature-model tables preserved with pinned provenance and checksums
 - Figure-extracted literature-model curves preserved with explicit digitization provenance and source-figure checksums
+- IceCube six-year cascade differential flux digitized from the published Figure 3
 
 ### REMOTE
 

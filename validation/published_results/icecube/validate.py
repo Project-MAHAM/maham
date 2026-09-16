@@ -90,6 +90,22 @@ def validate_combined(combined):
     require(np.allclose(np.round(combined["E2phi_90_upper"].to_value(scale.unit) / 1e-8, 1), upper90), "Published 90% profile-likelihood upper bounds are reproduced")
 
 
+
+def validate_cascade_2020(cascade, cascade_all):
+    require(len(cascade) == 13, "Six-year cascade spectrum contains 13 digitized Figure 3 bins")
+    require(cascade.meta["flavor_convention"] == "per_flavor", "Cascade native flux is per-flavor")
+    require(np.isclose(cascade.meta["confidence_level"], 0.68), "Cascade confidence level is 68% simultaneous coverage")
+    require(cascade.meta["interval_method"] == "digitized_68_percent_simultaneous_coverage", "Cascade interval provenance is explicit")
+    require(np.allclose(cascade.meta["sensitive_energy_range_GeV"], [1.6e4, 2.6e6]), "Published 16 TeV to 2.6 PeV sensitive range is retained")
+    upper = np.asarray(cascade["is_upper_limit"], dtype=bool)
+    require(np.array_equal(np.flatnonzero(upper), [5, 8, 9, 10, 11, 12]), "Cascade Figure 3 upper-limit bins are correctly identified")
+    require(u.allclose(cascade["E2phi"][2], 4.42099e-8 * E2PHI_UNIT), "Digitized 31.6 TeV cascade best-fit point is reproduced")
+    require(u.allclose(cascade["E2phi_upper"][5], 1.72801e-9 * E2PHI_UNIT), "Digitized first cascade upper limit is reproduced")
+    require(cascade_all.meta["flavor_convention"] == "all_flavor", "Cascade all-flavor view is explicitly constructed")
+    require(cascade_all.meta["flavor_assumption"] == "equal", "Cascade all-flavor view records the equal-flavor assumption")
+    require(u.allclose(cascade_all["E2phi"], 3 * cascade["E2phi"]), "Cascade equal-flavor all-flavor conversion is reproduced")
+
+
 def validate_throughgoing_muon(piecewise, piecewise_all):
     require(len(piecewise) == 5, "9.5-year through-going muon spectrum contains 5 published pieces")
     require(piecewise.meta["flavor_convention"] == "numu_nubar", "Native through-going muon flux is nu_mu + nubar_mu")
@@ -259,6 +275,39 @@ def plot_combined_spectrum(combined):
     plt.close(fig)
 
 
+
+def plot_cascade_2020(cascade):
+    energy = cascade["energy"].to_value(u.GeV)
+    energy_min = cascade["energy_min"].to_value(u.GeV)
+    energy_max = cascade["energy_max"].to_value(u.GeV)
+    xerr = np.vstack((energy - energy_min, energy_max - energy))
+    upper = np.asarray(cascade["is_upper_limit"], dtype=bool)
+    measured = ~upper
+    y = cascade["E2phi"].to_value(E2PHI_UNIT)
+    y_lower = cascade["E2phi_lower"].to_value(E2PHI_UNIT)
+    y_upper = cascade["E2phi_upper"].to_value(E2PHI_UNIT)
+    yerr = np.vstack((y[measured] - y_lower[measured], y_upper[measured] - y[measured]))
+
+    fig, ax = plt.subplots(figsize=(7, 5))
+    ax.set_xlim(3e3, 1.2e8)
+    ax.set_ylim(3e-10, 1.2e-7)
+    ax.errorbar(energy[measured], y[measured], xerr=xerr[:, measured], yerr=yerr, fmt="o", markersize=7, capsize=3, elinewidth=1.5, markeredgecolor="black", ecolor="black", markerfacecolor="white", markeredgewidth=1.5, linestyle="none", label="Differential flux")
+    plot_upper_limits(ax, energy[upper], y_upper[upper], xerr=xerr[:, upper], arrow_factor=2.5, color="black", linewidth=1.5, capsize=3, mutation_scale=12)
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+    ax.set_xlabel(r"Neutrino energy, $E_{\nu}$ [GeV]")
+    ax.set_ylabel(r"Flux, $E^{2}\Phi$ [GeV cm$^{-2}$ s$^{-1}$ sr$^{-1}$]")
+    ax.set_title("IceCube Six-Year Cascade Differential Flux (2020)")
+    ax.grid(True, which="both", alpha=0.25)
+    ax.text(0.97, 0.03, "Per flavor" "\n" "68% simultaneous coverage" "\n" "Sensitive range: 16 TeV-2.6 PeV", transform=ax.transAxes, ha="right", va="bottom", fontweight="bold")
+    bold_tick_labels(ax)
+    bold_legend(ax.legend(loc="upper right"))
+    fig.tight_layout()
+    fig.savefig(OUTPUT_DIR / "icecube_cascade_2020_piecewise.png", dpi=200)
+    fig.savefig(OUTPUT_DIR / "icecube_cascade_2020_piecewise.pdf")
+    plt.close(fig)
+
+
 def plot_throughgoing_muon(piecewise):
     energy = piecewise["energy"].to_value(u.GeV)
     energy_min = piecewise["energy_min"].to_value(u.GeV)
@@ -367,6 +416,8 @@ def main():
     glashow = get_dataset("icecube.glashow.flux.2021").load_e2phi()
     glashow_all = get_dataset("icecube.glashow.flux.2021").load_e2phi(flavor="all_flavor", flavor_assumption="equal")
     combined = get_dataset("icecube.combined_astrophysical_flux.2015").load_e2phi()
+    cascade = get_dataset("icecube.cascade_piecewise_flux.2020").load_e2phi()
+    cascade_all = get_dataset("icecube.cascade_piecewise_flux.2020").load_e2phi(flavor="all_flavor", flavor_assumption="equal")
     piecewise = get_dataset("icecube.throughgoing_muon_piecewise_flux.2022").load_e2phi()
     piecewise_all = get_dataset("icecube.throughgoing_muon_piecewise_flux.2022").load_e2phi(flavor="all_flavor", flavor_assumption="equal")
     ngc1068 = get_dataset("icecube.ngc1068_flux.2022").load_e2phi()
@@ -381,6 +432,9 @@ def main():
 
     print("\nCombined astrophysical spectrum 2015:")
     validate_combined(combined)
+
+    print("\nSix-year cascade spectrum 2020:")
+    validate_cascade_2020(cascade, cascade_all)
 
     print("\nThrough-going muon spectrum 2022:")
     validate_throughgoing_muon(piecewise, piecewise_all)
@@ -400,6 +454,7 @@ def main():
     print("\nGenerating validation figures...")
     plot_flux_results(limit, sensitivity, glashow_all)
     plot_combined_spectrum(combined)
+    plot_cascade_2020(cascade)
     plot_throughgoing_muon(piecewise)
     plot_ngc1068(ngc1068)
     plot_txs0506(txs0506)
