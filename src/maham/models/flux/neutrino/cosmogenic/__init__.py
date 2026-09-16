@@ -1,4 +1,7 @@
 from maham.models.flux.neutrino.cosmogenic.models import (
+    Allard2026FRIIModel1Cosmogenic,
+    Allard2026FRIIModel2Cosmogenic,
+    Allard2026FRIIModel3Cosmogenic,
     Aloisio2015Cosmogenic,
     Auger2023Cosmogenic,
     Berat2024Cosmogenic,
@@ -6,12 +9,19 @@ from maham.models.flux.neutrino.cosmogenic.models import (
     Condorelli2023Cosmogenic,
     Ehlert2024Cosmogenic,
     Heinze2019Cosmogenic,
+    KuznetsovPetrovSavchenko2026BestFitCosmogenic,
+    KuznetsovPetrovSavchenko2026LocalMinCosmogenic,
     MuzioFarrar2023Cosmogenic,
     MuzioUngerWissel2023Cosmogenic,
+    YoshidaMeier2026LogNormalCosmogenic,
+    YoshidaMeier2026NoEvolutionCosmogenic,
     ZhangMurase2019Cosmogenic,
 )
 
 __all__ = [
+    "Allard2026FRIIModel1Cosmogenic",
+    "Allard2026FRIIModel2Cosmogenic",
+    "Allard2026FRIIModel3Cosmogenic",
     "Aloisio2015Cosmogenic",
     "Auger2023Cosmogenic",
     "Berat2024Cosmogenic",
@@ -19,7 +29,11 @@ __all__ = [
     "Condorelli2023Cosmogenic",
     "Ehlert2024Cosmogenic",
     "Heinze2019Cosmogenic",
+    "KuznetsovPetrovSavchenko2026BestFitCosmogenic",
+    "KuznetsovPetrovSavchenko2026LocalMinCosmogenic",
     "MuzioFarrar2023Cosmogenic",
     "MuzioUngerWissel2023Cosmogenic",
+    "YoshidaMeier2026LogNormalCosmogenic",
+    "YoshidaMeier2026NoEvolutionCosmogenic",
     "ZhangMurase2019Cosmogenic",
 ]

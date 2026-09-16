@@ -24,6 +24,18 @@ The official IceCube release provides a nine-bin all-flavor `E2phi` astrophysica
 
 MAHAM derives the 68% and 90% confidence intervals directly from the released profile-likelihood scans rather than using the approximate covariance-matrix errors. Bins 6, 8, and 9 have zero best-fit normalization and are represented as upper limits.
 
+### IceCube Six-Year Cascade Differential Flux 2020
+
+MAHAM dataset:
+
+`icecube.cascade_piecewise_flux.2020`
+
+The native result is the per-flavor differential astrophysical neutrino flux shown by the black crosses in Figure 3 of the 2020 six-year cascade analysis. MAHAM digitizes the vector content of the published figure and preserves the displayed one-third-decade energy bins.
+
+The dataset contains 13 usable displayed bins: seven nonzero best-fit measurements and six upper limits. The paper states that the 1-sigma uncertainties and data limits correspond to 68% CL simultaneous coverage. The published sensitive energy range is `1.6e4` to `2.6e6 GeV`; Figure 3 also shows differential bins outside that range, which MAHAM retains.
+
+The native quantity is per-flavor `E2phi` for `nu+nubar`. MAHAM provides an explicit equal-flavor conversion to all-flavor for multimessenger comparisons.
+
 ### IceCube 9.5-Year Through-Going Muon Flux 2022
 
 MAHAM dataset:
@@ -106,6 +118,7 @@ It verifies:
 - effective-area flavor summation
 - the local electron-neutrino effective-area enhancement near the Glashow resonance
 - combined-spectrum profile-likelihood intervals at 68% and 90%
+- cascade Figure 3 digitization, 68% simultaneous-coverage intervals, and upper-limit classification
 - physical-boundary treatment of zero-best-fit flux bins
 - reconstruction of published NGC 1068 and TXS 0506+056 best-fit power laws
 - TXS 0506+056 flare duration and fluence consistency
@@ -122,6 +135,8 @@ The validation generates:
 - `icecube_flux_results.pdf`
 - `icecube_combined_2015_spectrum.png`
 - `icecube_combined_2015_spectrum.pdf`
+- `icecube_cascade_2020_piecewise.png`
+- `icecube_cascade_2020_piecewise.pdf`
 - `icecube_throughgoing_muon_2022_piecewise.png`
 - `icecube_throughgoing_muon_2022_piecewise.pdf`
 - `icecube_ngc1068_flux_2022.png`
