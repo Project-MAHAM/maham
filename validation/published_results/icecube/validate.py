@@ -30,6 +30,8 @@ def validate_ehe(limit, sensitivity):
     require(limit.meta["flavor_convention"] == "all_flavor", "EHE differential limit is all-flavor")
     require(sensitivity.meta["flavor_convention"] == "all_flavor", "EHE sensitivity is all-flavor")
     require(np.isclose(limit.meta["confidence_level"], 0.90), "EHE differential limit confidence level is 90%")
+    require(limit.meta["limit_normalization_convention"] == "log10_energy_width", "EHE differential-limit normalization is represented as a logarithmic energy width")
+    require(np.isclose(limit.meta["log10_energy_width_decades"], 1.0), "EHE differential limit is decade-wide")
     require(np.isclose(sensitivity.meta["confidence_level"], 0.90), "EHE sensitivity confidence level is 90%")
     require(u.allclose(limit["energy"][3], 1e8 * u.GeV), "Published EHE 1e8 GeV reference energy is reproduced")
     require(u.allclose(limit["E2phi"][3], 5.743e-9 * E2PHI_UNIT), "Published EHE 1e8 GeV differential limit is reproduced")

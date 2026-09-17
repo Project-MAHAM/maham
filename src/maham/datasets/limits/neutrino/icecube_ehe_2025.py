@@ -50,5 +50,7 @@ class IceCubeEHELimit2025(NeutrinoSpectrumDataset):
         table.meta["solid_angle_convention"] = self.metadata.solid_angle_convention
         table.meta["confidence_level"] = self.metadata.confidence_level
         table.meta["limit_type"] = "differential_upper_limit"
+        table.meta["limit_normalization_convention"] = "log10_energy_width"
+        table.meta["log10_energy_width_decades"] = 1.0
         table.meta["provenance"] = self.metadata.source.provenance.value
         return table

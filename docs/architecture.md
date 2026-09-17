@@ -23,6 +23,7 @@ MAHAM/
 │       │   ├── spectra/
 │       │   │   ├── __init__.py
 │       │   │   ├── conversions.py
+│       │   │   ├── limits.py
 │       │   │   └── weighting.py
 │       │   └── neutrino/
 │       │       ├── __init__.py
@@ -144,6 +145,10 @@ MAHAM/
 │       │   │   │   └── __init__.py
 │       │   │   └── neutrino/
 │       │   │       ├── __init__.py
+│       │   │       ├── anita_2019.py
+│       │   │       ├── ara_five_station_2026.py
+│       │   │       ├── auger_diffuse_neutrino_2023.py
+│       │   │       ├── baikal_gvd_2025.py
 │       │   │       └── icecube_ehe_2025.py
 │       │   ├── sensitivities/
 │       │   │   ├── __init__.py
@@ -159,8 +164,17 @@ MAHAM/
 │       │   │   ├── base.py
 │       │   │   └── neutrino/
 │       │   │       ├── __init__.py
+│       │   │       ├── anita_2019.py
+│       │   │       ├── ara_five_station_2026.py
+│       │   │       ├── baikal_gvd_2025.py
 │       │   │       ├── icecube_ehe_2025.py
 │       │   │       └── km3net_230213a_2025.py
+│       │   ├── efficiencies/
+│       │   │   ├── __init__.py
+│       │   │   ├── base.py
+│       │   │   └── neutrino/
+│       │   │       ├── __init__.py
+│       │   │       └── ara_five_station_2026.py
 │       │   └── events/
 │       │       ├── __init__.py
 │       │       └── neutrino/
@@ -215,9 +229,20 @@ MAHAM/
 │       │       │   │   └── telescope_array_combined_2023_digitized.csv
 │       │       │   └── gamma_ray/
 │       │       ├── limits/
+│       │       │   └── neutrino/
+│       │       │       ├── anita_i_iv_diffuse_neutrino_limit_2019.csv
+│       │       │       ├── ara_five_station_diffuse_neutrino_limit_2026.csv
+│       │       │       ├── auger_diffuse_neutrino_limit_2023.csv
+│       │       │       └── baikal_gvd_diffuse_neutrino_limit_2025.csv
 │       │       ├── sensitivities/
 │       │       ├── effective_area/
 │       │       │   └── neutrino/
+│       │       │       ├── anita_iv_acceptance_2019.csv
+│       │       │       ├── ara_five_station_trigger_acceptance_2026.csv
+│       │       │       └── baikal_gvd_effective_area_2025.csv
+│       │       ├── efficiencies/
+│       │       │   └── neutrino/
+│       │       │       └── ara_five_station_signal_efficiency_2026.csv
 │       │       └── events/
 │       │           └── neutrino/
 │       │               └── icecube_170922a_2017.csv
@@ -240,7 +265,8 @@ MAHAM/
 │   │   └── test_units.py
 │   ├── physics/
 │   │   ├── spectra/
-│   │   │   └── test_conversions.py
+│   │   │   ├── test_conversions.py
+│   │   │   └── test_limits.py
 │   │   └── neutrino/
 │   │       └── test_flavor.py
 │   ├── statistics/
@@ -271,7 +297,12 @@ MAHAM/
 │   │   ├── test_fermi_lat_igrb_egb_2015.py
 │   │   ├── test_km3net_230213a_2025.py
 │   │   ├── test_km3net_230213a_flux_2025.py
-│   │   └── test_km3net_230213a_effective_area_2025.py
+│   │   ├── test_km3net_230213a_effective_area_2025.py
+│   │   ├── test_anita_2019.py
+│   │   ├── test_ara_five_station_2026.py
+│   │   ├── test_auger_diffuse_neutrino_2023.py
+│   │   ├── test_baikal_gvd_2025.py
+│   │   └── test_upper_limit_normalization_metadata.py
 │   ├── integrations/
 │   └── plotting/
 ├── validation/
@@ -282,7 +313,26 @@ MAHAM/
 │   │   │   ├── validate.py
 │   │   │   └── outputs/
 │   │   │       └── .gitignore
+│   │   ├── anita/
+│   │   │   ├── README.md
+│   │   │   ├── validate.py
+│   │   │   └── outputs/
+│   │   │       └── .gitignore
+│   │   ├── ara/
+│   │   │   ├── README.md
+│   │   │   ├── validate.py
+│   │   │   └── outputs/
+│   │   │       └── .gitignore
 │   │   ├── auger/
+│   │   │   ├── README.md
+│   │   │   ├── validate.py
+│   │   │   └── outputs/
+│   │   │       └── .gitignore
+│   │   ├── baikal_gvd/
+│   │   │   ├── README.md
+│   │   │   ├── validate.py
+│   │   │   └── outputs/
+│   │   │       └── .gitignore
 │   │   ├── telescope_array/
 │   │   ├── fermi_lat/
 │   │   └── km3net/
@@ -343,6 +393,10 @@ MAHAM is organized by scientific concept rather than by experiment.
 - MAHAM does not silently convert neutrino flavor conventions. Physical assumptions required for a conversion must be explicit.
 - Generic scientific concepts should not be placed in experiment-specific top-level namespaces.
 - `utils` and `helpers` catch-all modules are avoided. Functionality belongs in the scientific concept that owns it.
+- Published detector-response products such as effective areas, acceptances, and efficiencies are distinct dataset types and are not silently combined. Derived response quantities must be explicit and documented in metadata.
+- Generic operations on published spectral limits, including normalization between differential-limit conventions, belong under `physics/spectra/`; experiment-specific published limits remain under `datasets/limits/`.
+- Published differential limits preserve their native normalization convention. Common comparison conventions are constructed explicitly from native metadata rather than inferred from the spacing of plotted or tabulated energy points.
+- Limits and sensitivities are distinct scientific products and remain separate dataset categories.
 
 ## Scientific provenance
 
@@ -444,3 +498,17 @@ Cross-family `J <-> phi` conversion is permitted only when the dataset or model 
 
 Neutrino flavor conventions are handled independently of spectral weighting. Conversions requiring physical assumptions, such as equal flavor composition, must be requested explicitly.
 
+## Differential-limit normalization
+
+MAHAM preserves the native normalization convention of published differential upper limits.
+
+For limits defined using an explicit logarithmic energy width, the native width is recorded with:
+
+- `limit_normalization_convention = "log10_energy_width"`
+- `log10_energy_width_decades`
+
+For experiment-specific historical conventions, the native convention and its parameters are recorded explicitly rather than translated into a fictitious energy-bin width.
+
+Conversions to a common comparison convention are performed by reusable functions in `physics/spectra/limits.py`. Converted tables retain metadata describing the native convention, target convention, and applied normalization scale factor.
+
+The spacing of tabulated or plotted energy points is not assumed to define the statistical width of a differential limit.
