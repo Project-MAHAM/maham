@@ -41,7 +41,7 @@ class TrinityDiffuseSensitivity2025(NeutrinoSpectrumDataset):
         source=DataSource(
             provenance=ProvenanceType.DIGITIZED,
             storage=StorageMode.BUNDLED,
-            path="data/datasets/sensitivities/neutrino/trinity_2025_10yr_sensitivity_vector_extracted.csv",
+            path="data/datasets/sensitivities/neutrino/trinity_diffuse_neutrino_sensitivity_2025.csv",
             sha256="83b5be480f37ebcd76512f67abc61288c4a4f12ee94f644b342ca0201fa53038",
         ),
         notes=(

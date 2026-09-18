@@ -34,7 +34,7 @@ def main():
     ax.loglog(table["energy"].to_value(u.GeV), table["E2phi"].to_value(UNIT), color="darkcyan", linestyle="--", linewidth=2.0, marker="o", markerfacecolor="none", label="Trinity 10 yr")
     ax.set_xlabel("Neutrino energy [GeV]", fontweight="bold")
     ax.set_ylabel(r"$E^2\Phi$ [GeV cm$^{-2}$ s$^{-1}$ sr$^{-1}$]", fontweight="bold")
-    ax.set_title("Trinity ICRC2025 Vector Extraction", fontweight="bold")
+    ax.set_title("Trinity 2025 Sensitivity Validation", fontweight="bold")
     ax.grid(True, which="both", alpha=0.2)
     ax.legend(frameon=True)
     bold_tick_labels(ax)

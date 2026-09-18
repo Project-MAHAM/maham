@@ -41,7 +41,7 @@ class GRAND200kDiffuseSensitivity2021(NeutrinoSpectrumDataset):
         source=DataSource(
             provenance=ProvenanceType.DIGITIZED,
             storage=StorageMode.BUNDLED,
-            path="data/datasets/sensitivities/neutrino/grand200k_2021_10yr_sensitivity_vector_extracted.csv",
+            path="data/datasets/sensitivities/neutrino/grand200k_diffuse_neutrino_sensitivity_2021.csv",
             sha256="a0f7dea93ff43c58585e2fc110e0799c0df954324683a6a51ddb13b287206d80",
         ),
         notes=(

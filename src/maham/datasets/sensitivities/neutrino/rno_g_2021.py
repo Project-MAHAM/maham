@@ -30,7 +30,7 @@ class RNOGDiffuseSensitivity2021(NeutrinoSpectrumDataset):
         solid_angle_convention="per_sr",
         paper=_PAPER,
         dataset_reference=_REPOSITORY,
-        source=DataSource(provenance=ProvenanceType.DERIVED, storage=StorageMode.BUNDLED, path="data/datasets/sensitivities/neutrino/rno_g_diffuse_sensitivity_2021.csv", sha256="3671911d487aaa8e5186adccde734245e45b92d4a30fde1e918d074bb0ec3dac"),
+        source=DataSource(provenance=ProvenanceType.DERIVED, storage=StorageMode.BUNDLED, path="data/datasets/sensitivities/neutrino/rno_g_diffuse_neutrino_sensitivity_2021.csv", sha256="3671911d487aaa8e5186adccde734245e45b92d4a30fde1e918d074bb0ec3dac"),
         notes=(
             "Derived from the official RNO-G Veff_dipole_array_Bastille_secondaries.json at repository commit c7913a3fc3a0a48b0e6689200bf1f4d4e8cf57a0.",
             "Parent effective-volume source SHA256: 8ec29a23489114d39c9163ed94adce4b0ea04fb4e6c135115e0fdd5e0b0df7c6.",
