@@ -249,11 +249,11 @@ MAHAM/
 │       │       │       └── baikal_gvd_diffuse_neutrino_limit_2025.csv
 │       │       ├── sensitivities/
 │       │       │   └── neutrino/
-│       │       │       ├── grand200k_2021_10yr_sensitivity_vector_extracted.csv
-│       │       │       ├── icecube_gen2_radio_2021_10yr_sensitivity_vector_extracted.csv
-│       │       │       ├── pueo_icrc2025_30d_ses_digitized.csv
-│       │       │       ├── rno_g_diffuse_sensitivity_2021.csv
-│       │       │       └── trinity_2025_10yr_sensitivity_vector_extracted.csv
+│       │       │       ├── grand200k_diffuse_neutrino_sensitivity_2021.csv
+│       │       │       ├── icecube_gen2_radio_diffuse_neutrino_sensitivity_2021.csv
+│       │       │       ├── pueo_diffuse_neutrino_ses_2025.csv
+│       │       │       ├── rno_g_diffuse_neutrino_sensitivity_2021.csv
+│       │       │       └── trinity_diffuse_neutrino_sensitivity_2025.csv
 │       │       ├── effective_area/
 │       │       │   └── neutrino/
 │       │       │       ├── anita_iv_acceptance_2019.csv

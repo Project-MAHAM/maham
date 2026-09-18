@@ -31,7 +31,7 @@ def main():
     ax.loglog(table["energy"].to_value(u.GeV), table["E2phi"].to_value(UNIT), color="forestgreen", linestyle="--", linewidth=2.0, marker="o", markerfacecolor="none", label="IceCube-Gen2 Radio 10 yr")
     ax.set_xlabel("Neutrino energy [GeV]", fontweight="bold")
     ax.set_ylabel(r"$E^2\Phi$ [GeV cm$^{-2}$ s$^{-1}$ sr$^{-1}$]", fontweight="bold")
-    ax.set_title("IceCube-Gen2 Radio ICRC2021 Vector Extraction", fontweight="bold")
+    ax.set_title("IceCube-Gen2 Radio 2021 Sensitivity Validation", fontweight="bold")
     ax.grid(True, which="both", alpha=0.2)
     ax.legend(frameon=True)
     bold_tick_labels(ax)

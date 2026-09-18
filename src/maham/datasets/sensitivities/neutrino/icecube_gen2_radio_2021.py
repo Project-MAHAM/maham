@@ -40,7 +40,7 @@ class IceCubeGen2RadioDiffuseSensitivity2021(NeutrinoSpectrumDataset):
         source=DataSource(
             provenance=ProvenanceType.DIGITIZED,
             storage=StorageMode.BUNDLED,
-            path="data/datasets/sensitivities/neutrino/icecube_gen2_radio_2021_10yr_sensitivity_vector_extracted.csv",
+            path="data/datasets/sensitivities/neutrino/icecube_gen2_radio_diffuse_neutrino_sensitivity_2021.csv",
             sha256="68fce5381d48c0b04c09d917c7a2981b139f6e60cacdc7b7e136fe99de663838",
         ),
         notes=(

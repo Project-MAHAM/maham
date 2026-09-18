@@ -39,7 +39,7 @@ class PUEODiffuseSensitivity2025(NeutrinoSpectrumDataset):
         source=DataSource(
             provenance=ProvenanceType.DIGITIZED,
             storage=StorageMode.BUNDLED,
-            path="data/datasets/sensitivities/neutrino/pueo_icrc2025_30d_ses_digitized.csv",
+            path="data/datasets/sensitivities/neutrino/pueo_diffuse_neutrino_ses_2025.csv",
             sha256="b683db1e2f3cd478eb408dcf4c24d18a893c448052f922a487fb44e68d08d8c6",
         ),
         notes=(
