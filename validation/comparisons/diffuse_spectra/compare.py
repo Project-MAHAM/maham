@@ -8,7 +8,7 @@ from matplotlib.ticker import LogLocator, NullFormatter
 from maham.datasets import get_dataset
 from maham.models import get_model, list_models
 from maham.models.flux.neutrino import family_envelope
-from maham.physics.spectra import convert_limit_normalization_to_decade_width, normalize_spectral_quantity, spectral_quantity_info
+from maham.physics.spectra import convert_limit_normalization_to_decade_width, convert_sensitivity_normalization_to_decade_width, convert_single_event_sensitivity_to_confidence_level, normalize_spectral_quantity, spectral_quantity_info
 from maham.plotting import apply_plot_style, bold_legend, bold_tick_labels, plot_upper_limits
 
 PLOT_QUANTITY = "E2phi"
@@ -33,7 +33,7 @@ LIMIT_STYLE = {
     "icecube_ehe": {"color": "limegreen", "lw": 2.2},
     "auger_nu": {"color": "lightskyblue", "lw": 2.0},
     "ara": {"color": "deeppink", "lw": 2.1},
-    "anita": {"color": "gray", "lw": 2.0},
+    "anita": {"color": "mediumpurple", "lw": 2.0},
 }
 LIMIT_LABELS = {
     "icecube_ehe": "IceCube EHE 2025",
@@ -42,8 +42,12 @@ LIMIT_LABELS = {
     "anita": "ANITA I-IV",
 }
 LIMIT_KEYS = ("icecube_ehe", "auger_nu", "ara", "anita")
+SENSITIVITY_STYLE = {"rno_g": {"color": "mediumvioletred", "lw": 2.0, "ls": "--"}, "pueo": {"color": "indigo", "lw": 2.0, "ls": "--"}, "icecube_gen2_radio": {"color": "forestgreen", "lw": 2.0, "ls": "--"}, "grand200k": {"color": "saddlebrown", "lw": 2.0, "ls": "--"}, "trinity": {"color": "darkcyan", "lw": 2.0, "ls": "--"}}
+SENSITIVITY_LABELS = {"rno_g": "RNO-G 35 stn, 5 yr", "pueo": "PUEO 30 d", "icecube_gen2_radio": "IceCube-Gen2 Radio 10 yr", "grand200k": "GRAND200k 10 yr", "trinity": "Trinity 10 yr"}
+SENSITIVITY_KEYS = ("rno_g", "pueo", "icecube_gen2_radio", "grand200k", "trinity")
 
 ZORDER_MODELS = 0
+ZORDER_SENSITIVITIES = 8
 ZORDER_LIMITS = 15
 ZORDER_SPECTRA = 30
 ZORDER_SPECTRUM_UL = 34
@@ -163,6 +167,11 @@ def load_datasets():
         "auger_nu": get_dataset("auger.diffuse_neutrino_limit.2023"),
         "ara": get_dataset("ara.five_station.diffuse_neutrino_limit.2026"),
         "anita": get_dataset("anita.i_iv_diffuse_neutrino_limit.2019"),
+        "rno_g": get_dataset("rno_g.design.diffuse_sensitivity.2021"),
+        "pueo": get_dataset("pueo.diffuse_sensitivity.2025"),
+        "icecube_gen2_radio": get_dataset("icecube_gen2.radio.diffuse_sensitivity.2021"),
+        "grand200k": get_dataset("grand200k.diffuse_sensitivity.2021"),
+        "trinity": get_dataset("trinity.diffuse_sensitivity.2025"),
     }
     tables = {
         "auger_cr": datasets["auger_cr"].load(quantity=quantity),
@@ -176,9 +185,16 @@ def load_datasets():
         "auger_nu": datasets["auger_nu"].load(quantity=quantity, flavor="all_flavor", flavor_assumption="equal"),
         "ara": datasets["ara"].load(quantity=quantity, flavor="all_flavor"),
         "anita": datasets["anita"].load(quantity=quantity, flavor="all_flavor"),
+        "rno_g": datasets["rno_g"].load(quantity=quantity, flavor="all_flavor"),
+        "pueo": datasets["pueo"].load(quantity=quantity, flavor="all_flavor"),
+        "icecube_gen2_radio": datasets["icecube_gen2_radio"].load(quantity=quantity, flavor="all_flavor"),
+        "grand200k": datasets["grand200k"].load(quantity=quantity, flavor="all_flavor"),
+        "trinity": datasets["trinity"].load(quantity=quantity, flavor="all_flavor"),
     }
     for key in LIMIT_KEYS:
         tables[key] = convert_limit_normalization_to_decade_width(tables[key], target_width_decades=1.0)
+    tables["pueo"] = convert_sensitivity_normalization_to_decade_width(tables["pueo"], target_width_decades=1.0)
+    tables["pueo"] = convert_single_event_sensitivity_to_confidence_level(tables["pueo"], confidence_level=0.90, method="feldman_cousins", n_observed=0, expected_background=0.0)
     labels = {
         "auger_cr": "Pierre Auger Combined Spectrum 2021",
         "ta": "Telescope Array Combined Spectrum 2023",
@@ -191,6 +207,11 @@ def load_datasets():
         "auger_nu": "Pierre Auger Diffuse Neutrino Upper Limit 2023",
         "ara": "ARA Five-Station Diffuse Neutrino Upper Limit 2026",
         "anita": "ANITA I-IV Diffuse Neutrino Upper Limit 2019",
+        "rno_g": "RNO-G 35-Station Five-Year Diffuse Neutrino Sensitivity 2021",
+        "pueo": "PUEO 30-Day Diffuse Neutrino Sensitivity 2025",
+        "icecube_gen2_radio": "IceCube-Gen2 Radio Ten-Year Diffuse Neutrino Sensitivity 2021",
+        "grand200k": "GRAND200k Ten-Year Diffuse Neutrino Sensitivity 2021",
+        "trinity": "Trinity Observatory Ten-Year Diffuse Neutrino Sensitivity 2025",
     }
     for key in datasets:
         print_dataset_metadata(datasets[key], tables[key], labels[key])
@@ -211,6 +232,11 @@ def validate_comparison(tables):
         "auger_nu": "Auger neutrino limit",
         "ara": "ARA",
         "anita": "ANITA",
+        "rno_g": "RNO-G projected sensitivity",
+        "pueo": "PUEO projected sensitivity",
+        "icecube_gen2_radio": "IceCube-Gen2 Radio projected sensitivity",
+        "grand200k": "GRAND200k projected sensitivity",
+        "trinity": "Trinity projected sensitivity",
     }
     for key, table in tables.items():
         require(table.meta["quantity"] == quantity, f"{names[key]} is represented as {quantity}")
@@ -245,6 +271,33 @@ def validate_comparison(tables):
     require(tables["anita"].meta["native_limit_normalization_convention"] == "anita_bandwidth", "ANITA retains its native bandwidth normalization provenance")
     require(np.isclose(tables["anita"].meta["native_limit_bandwidth_factor"], 4.0), "ANITA native bandwidth factor is Delta=4")
     require(np.isclose(tables["anita"].meta["limit_normalization_scale_factor"], 4.0 / np.log(10.0)), "ANITA bandwidth normalization is converted by 4/ln(10) to one decade")
+    require(tables["rno_g"].meta["sensitivity_type"] == "projected_differential_upper_limit", "RNO-G is explicitly represented as a projected differential sensitivity")
+    require(np.isclose(tables["rno_g"].meta["confidence_level"], 0.90), "RNO-G projected sensitivity is represented at 90% CL")
+    require(tables["rno_g"].meta["flavor_convention"] == "all_flavor", "RNO-G projected sensitivity is native all flavor")
+    require(tables["rno_g"].meta["figure24_mode"] == "approximate", "RNO-G retains the official Figure 24 approximate-mode provenance")
+    require(np.isclose(tables["rno_g"].meta["figure24_effective_area_scale_factor"], 5.0), "RNO-G retains the official Figure 24 decade_factor=5 approximation")
+    require(tables["pueo"].meta.get("native_sensitivity_type") == "single_event_sensitivity", "PUEO retains single-event sensitivity as its native statistical convention")
+    require(tables["pueo"].meta["sensitivity_type"] == "projected_confidence_level_sensitivity", "PUEO is explicitly converted to a confidence-level projected sensitivity")
+    require(np.isclose(tables["pueo"].meta["confidence_level"], 0.90), "PUEO is converted to 90% CL")
+    require(tables["pueo"].meta["statistical_method"] == "feldman_cousins", "PUEO uses Feldman-Cousins statistics")
+    require(np.isclose(tables["pueo"].meta["native_sensitivity_bandwidth_factor"], 4.0), "PUEO retains native Delta=4 bandwidth provenance")
+    require(np.isclose(tables["pueo"].meta["log10_energy_width_decades"], 1.0), "PUEO is represented with one-decade normalization")
+    require(np.isclose(tables["icecube_gen2_radio"].meta["confidence_level"], 0.90), "IceCube-Gen2 Radio is native 90% CL")
+    require(tables["icecube_gen2_radio"].meta["flavor_convention"] == "all_flavor", "IceCube-Gen2 Radio is native all flavor")
+    require(tables["icecube_gen2_radio"].meta["response_level"] == "trigger_level", "IceCube-Gen2 Radio sensitivity is trigger level")
+    require(np.isclose(tables["icecube_gen2_radio"].meta["log10_energy_width_decades"], 1.0), "IceCube-Gen2 Radio uses native decade-wide bins")
+    require(np.isclose(tables["icecube_gen2_radio"].meta["plot_point_spacing_decades"], 0.5), "IceCube-Gen2 Radio plotting points are half-decade spaced")
+    require(np.isclose(tables["grand200k"].meta["confidence_level"], 0.90), "GRAND200k is native 90% CL")
+    require(tables["grand200k"].meta["flavor_convention"] == "all_flavor", "GRAND200k is native all flavor")
+    require(tables["grand200k"].meta["response_level"] == "trigger_level", "GRAND200k sensitivity is trigger level")
+    require(tables["grand200k"].meta["statistical_method"] == "feldman_cousins", "GRAND200k uses Feldman-Cousins statistics")
+    require(np.isclose(tables["grand200k"].meta["feldman_cousins_upper_count"], 2.44), "GRAND200k preserves the published FC upper count 2.44")
+    require(np.isclose(tables["grand200k"].meta["log10_energy_width_decades"], 1.0), "GRAND200k uses native decade-wide normalization")
+    require(np.isclose(tables["trinity"].meta["confidence_level"], 0.90), "Trinity is native 90% CL")
+    require(tables["trinity"].meta["flavor_convention"] == "all_flavor", "Trinity is native all flavor")
+    require(np.isclose(tables["trinity"].meta["duty_cycle"], 0.20), "Trinity preserves the published 20% duty cycle")
+    require(np.isclose(tables["trinity"].meta["log10_energy_width_decades"], 1.0), "Trinity uses native decade-wide normalization")
+    require(tables["trinity"].meta["statistical_method"] == "not_specified_in_source", "Trinity statistical method is not inferred beyond the published 90% CL")
 
 def plot_fermi(ax, table, quantity, unit):
     s = STYLE["fermi"]
@@ -318,6 +371,10 @@ def plot_limit_curve(ax, table, quantity, unit, key):
     style = LIMIT_STYLE[key]
     return ax.plot(table["energy"].to_value(u.GeV), table[quantity].to_value(unit), color=style["color"], linestyle="-", linewidth=style["lw"], label=LIMIT_LABELS[key], zorder=ZORDER_LIMITS)[0]
 
+def plot_sensitivity_curve(ax, table, quantity, unit, key):
+    style = SENSITIVITY_STYLE[key]
+    return ax.plot(table["energy"].to_value(u.GeV), table[quantity].to_value(unit), color=style["color"], linestyle=style["ls"], linewidth=style["lw"], label=SENSITIVITY_LABELS[key], zorder=ZORDER_SENSITIVITIES)[0]
+
 def determine_axis_limits(tables, quantity, unit):
     all_x = []
     for table in tables.values():
@@ -345,6 +402,7 @@ def plot_comparison(tables):
     ax.set_ylim(ymin, ymax)
     configure_log_x_ticks(ax)
     model_handles = plot_model_envelopes(ax, load_model_envelopes(quantity), quantity)
+    sensitivity_handles = [plot_sensitivity_curve(ax, tables[key], quantity, unit, key) for key in SENSITIVITY_KEYS]
     limit_handles = [
         plot_limit_curve(ax, tables["icecube_ehe"], quantity, unit, "icecube_ehe"),
         plot_limit_curve(ax, tables["auger_nu"], quantity, unit, "auger_nu"),
@@ -368,10 +426,14 @@ def plot_comparison(tables):
     observation_legend = ax.legend(handles=observation_handles, loc="upper left", ncol=3, frameon=True, fontsize=LEGEND_FONTSIZE, title_fontsize=LEGEND_TITLE_FONTSIZE)
     bold_legend(observation_legend)
     ax.add_artist(observation_legend)
-    limit_legend = ax.legend(handles=limit_handles, title="90% CL UL", loc="lower left", ncol=5, frameon=True, fontsize=LEGEND_FONTSIZE, title_fontsize=LEGEND_TITLE_FONTSIZE)
+    limit_legend = ax.legend(handles=limit_handles, title="Current 90% CL upper limits", loc="lower left", ncol=5, frameon=True, fontsize=LEGEND_FONTSIZE, title_fontsize=LEGEND_TITLE_FONTSIZE)
     limit_legend.get_title().set_fontweight("bold")
     bold_legend(limit_legend)
     ax.add_artist(limit_legend)
+    sensitivity_legend = ax.legend(handles=sensitivity_handles, title="Projected 90% CL sensitivities", loc="center left", bbox_to_anchor=(0.01, 0.28), ncol=3, frameon=True, fontsize=LEGEND_FONTSIZE, title_fontsize=LEGEND_TITLE_FONTSIZE)
+    sensitivity_legend.get_title().set_fontweight("bold")
+    bold_legend(sensitivity_legend)
+    ax.add_artist(sensitivity_legend)
     model_legend = ax.legend(handles=model_handles, title="Model envelopes", loc="center left", bbox_to_anchor=(0.01, 0.50), ncol=1, frameon=True, fontsize=LEGEND_FONTSIZE, title_fontsize=LEGEND_TITLE_FONTSIZE)
     model_legend.get_title().set_fontweight("bold")
     bold_legend(model_legend)
