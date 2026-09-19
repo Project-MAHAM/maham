@@ -41,10 +41,10 @@ LIMIT_LABELS = {
     "ara": "ARA 10.6 yr",
     "anita": "ANITA I-IV",
 }
-LIMIT_KEYS = ("icecube_ehe", "auger_nu", "ara", "anita")
-SENSITIVITY_STYLE = {"rno_g": {"color": "mediumvioletred", "lw": 2.0, "ls": "--"}, "pueo": {"color": "indigo", "lw": 2.0, "ls": "--"}, "icecube_gen2_radio": {"color": "forestgreen", "lw": 2.0, "ls": "--"}, "grand200k": {"color": "saddlebrown", "lw": 2.0, "ls": "--"}, "trinity": {"color": "darkcyan", "lw": 2.0, "ls": "--"}}
-SENSITIVITY_LABELS = {"rno_g": "RNO-G 35 stn, 5 yr", "pueo": "PUEO 30 d", "icecube_gen2_radio": "IceCube-Gen2 Radio 10 yr", "grand200k": "GRAND200k 10 yr", "trinity": "Trinity 10 yr"}
-SENSITIVITY_KEYS = ("rno_g", "pueo", "icecube_gen2_radio", "grand200k", "trinity")
+LIMIT_KEYS = ("ara", "icecube_ehe", "anita", "auger_nu")
+SENSITIVITY_STYLE = {"rno_g": {"color": "mediumvioletred", "lw": 2.0, "ls": "--"}, "icecube_gen2_radio": {"color": "forestgreen", "lw": 2.0, "ls": "--"}, "pueo": {"color": "indigo", "lw": 2.0, "ls": "--"}, "grand200k": {"color": "saddlebrown", "lw": 2.0, "ls": "--"}, "trinity": {"color": "darkcyan", "lw": 2.0, "ls": "--"}, "ret_n": {"color": "crimson", "lw": 2.0, "ls": "--"}}
+SENSITIVITY_LABELS = {"rno_g": "RNO-G 35 stn, 5 yr", "icecube_gen2_radio": "IceCube-Gen2 Radio 10 yr", "pueo": "PUEO 30 d", "grand200k": "GRAND200k 10 yr", "trinity": "Trinity 10 yr", "ret_n": "RET-N 10 stn, 10 yr"}
+SENSITIVITY_KEYS = ("rno_g", "icecube_gen2_radio", "pueo", "grand200k", "trinity", "ret_n")
 
 ZORDER_MODELS = 0
 ZORDER_SENSITIVITIES = 8
@@ -172,6 +172,7 @@ def load_datasets():
         "icecube_gen2_radio": get_dataset("icecube_gen2.radio.diffuse_sensitivity.2021"),
         "grand200k": get_dataset("grand200k.diffuse_sensitivity.2021"),
         "trinity": get_dataset("trinity.diffuse_sensitivity.2025"),
+        "ret_n": get_dataset("ret_n.diffuse_sensitivity.2022"),
     }
     tables = {
         "auger_cr": datasets["auger_cr"].load(quantity=quantity),
@@ -190,6 +191,7 @@ def load_datasets():
         "icecube_gen2_radio": datasets["icecube_gen2_radio"].load(quantity=quantity, flavor="all_flavor"),
         "grand200k": datasets["grand200k"].load(quantity=quantity, flavor="all_flavor"),
         "trinity": datasets["trinity"].load(quantity=quantity, flavor="all_flavor"),
+        "ret_n": datasets["ret_n"].load(quantity=quantity, flavor="all_flavor"),
     }
     for key in LIMIT_KEYS:
         tables[key] = convert_limit_normalization_to_decade_width(tables[key], target_width_decades=1.0)
@@ -212,6 +214,7 @@ def load_datasets():
         "icecube_gen2_radio": "IceCube-Gen2 Radio Ten-Year Diffuse Neutrino Sensitivity 2021",
         "grand200k": "GRAND200k Ten-Year Diffuse Neutrino Sensitivity 2021",
         "trinity": "Trinity Observatory Ten-Year Diffuse Neutrino Sensitivity 2025",
+        "ret_n": "RET-N Ten-Station Ten-Year Diffuse Neutrino Sensitivity 2022",
     }
     for key in datasets:
         print_dataset_metadata(datasets[key], tables[key], labels[key])
@@ -237,6 +240,7 @@ def validate_comparison(tables):
         "icecube_gen2_radio": "IceCube-Gen2 Radio projected sensitivity",
         "grand200k": "GRAND200k projected sensitivity",
         "trinity": "Trinity projected sensitivity",
+        "ret_n": "RET-N projected sensitivity",
     }
     for key, table in tables.items():
         require(table.meta["quantity"] == quantity, f"{names[key]} is represented as {quantity}")
@@ -298,6 +302,17 @@ def validate_comparison(tables):
     require(np.isclose(tables["trinity"].meta["duty_cycle"], 0.20), "Trinity preserves the published 20% duty cycle")
     require(np.isclose(tables["trinity"].meta["log10_energy_width_decades"], 1.0), "Trinity uses native decade-wide normalization")
     require(tables["trinity"].meta["statistical_method"] == "not_specified_in_source", "Trinity statistical method is not inferred beyond the published 90% CL")
+
+    require(np.isclose(tables["ret_n"].meta["confidence_level"], 0.90), "RET-N is native 90% CL")
+    require(tables["ret_n"].meta["flavor_convention"] == "all_flavor", "RET-N is native all flavor")
+    require(np.isclose(tables["ret_n"].meta["projection_years"], 10.0), "RET-N preserves the ten-year projection")
+    require(tables["ret_n"].meta["benchmark_stations"] == 10, "RET-N preserves the ten-station benchmark")
+    require(np.isclose(tables["ret_n"].meta["transmitter_power_kw_per_station"], 100.0), "RET-N preserves the 100 kW transmitter power per station")
+    require(tables["ret_n"].meta["response_level"] == "trigger_level", "RET-N sensitivity preserves its trigger-level design assumption")
+    require(np.isclose(tables["ret_n"].meta["trigger_snr_db"], 0.0), "RET-N preserves the 0 dB trigger assumption")
+    require(np.isclose(tables["ret_n"].meta["trigger_noise_bandwidth_mhz"], 50.0), "RET-N preserves the 50 MHz trigger-noise bandwidth")
+    require(np.isclose(tables["ret_n"].meta["log10_energy_width_decades"], 1.0), "RET-N uses native decade-wide normalization")
+    require(tables["ret_n"].meta["statistical_method"] == "not_specified_in_source", "RET-N statistical method is not inferred beyond the published 90% CL")
 
 def plot_fermi(ax, table, quantity, unit):
     s = STYLE["fermi"]
@@ -403,12 +418,7 @@ def plot_comparison(tables):
     configure_log_x_ticks(ax)
     model_handles = plot_model_envelopes(ax, load_model_envelopes(quantity), quantity)
     sensitivity_handles = [plot_sensitivity_curve(ax, tables[key], quantity, unit, key) for key in SENSITIVITY_KEYS]
-    limit_handles = [
-        plot_limit_curve(ax, tables["icecube_ehe"], quantity, unit, "icecube_ehe"),
-        plot_limit_curve(ax, tables["auger_nu"], quantity, unit, "auger_nu"),
-        plot_limit_curve(ax, tables["ara"], quantity, unit, "ara"),
-        plot_limit_curve(ax, tables["anita"], quantity, unit, "anita"),
-    ]
+    limit_handles = [plot_limit_curve(ax, tables[key], quantity, unit, key) for key in LIMIT_KEYS]
     h_fermi = plot_fermi(ax, tables["fermi"], quantity, unit)
     h_auger_cr = plot_auger_cr(ax, tables["auger_cr"], quantity, unit)
     h_ta = plot_ta(ax, tables["ta"], quantity, unit)
@@ -426,11 +436,11 @@ def plot_comparison(tables):
     observation_legend = ax.legend(handles=observation_handles, loc="upper left", ncol=3, frameon=True, fontsize=LEGEND_FONTSIZE, title_fontsize=LEGEND_TITLE_FONTSIZE)
     bold_legend(observation_legend)
     ax.add_artist(observation_legend)
-    limit_legend = ax.legend(handles=limit_handles, title="Current 90% CL upper limits", loc="lower left", ncol=5, frameon=True, fontsize=LEGEND_FONTSIZE, title_fontsize=LEGEND_TITLE_FONTSIZE)
+    limit_legend = ax.legend(handles=limit_handles, title="Current 90% CL upper limits", loc="lower left", ncol=4, frameon=True, fontsize=LEGEND_FONTSIZE, title_fontsize=LEGEND_TITLE_FONTSIZE)
     limit_legend.get_title().set_fontweight("bold")
     bold_legend(limit_legend)
     ax.add_artist(limit_legend)
-    sensitivity_legend = ax.legend(handles=sensitivity_handles, title="Projected 90% CL sensitivities", loc="center left", bbox_to_anchor=(0.01, 0.28), ncol=3, frameon=True, fontsize=LEGEND_FONTSIZE, title_fontsize=LEGEND_TITLE_FONTSIZE)
+    sensitivity_legend = ax.legend(handles=sensitivity_handles, title="Projected 90% CL sensitivities", loc="center left", bbox_to_anchor=(0.01, 0.28), ncol=2, frameon=True, fontsize=LEGEND_FONTSIZE, title_fontsize=LEGEND_TITLE_FONTSIZE)
     sensitivity_legend.get_title().set_fontweight("bold")
     bold_legend(sensitivity_legend)
     ax.add_artist(sensitivity_legend)
