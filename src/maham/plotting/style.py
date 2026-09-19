@@ -26,3 +26,15 @@ def bold_legend(legend):
         text.set_fontweight("bold")
     if legend.get_title() is not None:
         legend.get_title().set_fontweight("bold")
+
+
+def validation_curve_style(product):
+    """Return the standard monochrome curve style for validation plots."""
+    styles = {
+        "upper_limit": {"color": "black", "linestyle": "-", "linewidth": 2.5},
+        "sensitivity": {"color": "black", "linestyle": "--", "linewidth": 2.5},
+    }
+    try:
+        return styles[product].copy()
+    except KeyError as exc:
+        raise ValueError(f"Unknown validation product: {product!r}") from exc

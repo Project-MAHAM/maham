@@ -6,7 +6,7 @@ import numpy as np
 
 from maham.datasets import get_dataset
 from maham.physics.spectra import convert_sensitivity_normalization_to_decade_width, convert_single_event_sensitivity_to_confidence_level
-from maham.plotting import apply_plot_style, bold_tick_labels
+from maham.plotting import apply_plot_style, bold_tick_labels, validation_curve_style
 
 
 OUTPUT_DIR = Path(__file__).resolve().parent / "outputs"
@@ -30,13 +30,14 @@ def main():
 
     x = native["energy"].to_value(u.GeV)
     fig, ax = plt.subplots(figsize=(8, 5))
-    ax.loglog(x, native["E2phi"].to_value(UNIT), linewidth=1.8, label="Native PUEO 30d SES, Delta=4")
-    ax.loglog(x, decade["E2phi"].to_value(UNIT), linestyle=":", linewidth=1.8, label="One-decade SES")
-    ax.loglog(x, fc90["E2phi"].to_value(UNIT), color="indigo", linestyle="--", linewidth=2.0, label="One-decade 90% FC sensitivity")
+    ax.loglog(x, native["E2phi"].to_value(UNIT), color="0.55", linestyle="--", linewidth=1.5, label="Native 30 d SES, Delta=4")
+    ax.loglog(x, decade["E2phi"].to_value(UNIT), color="0.55", linestyle=":", linewidth=1.5, label="One-decade SES")
+    ax.loglog(x, fc90["E2phi"].to_value(UNIT), label="One-decade 90% FC sensitivity", **validation_curve_style("sensitivity"))
     ax.set_xlabel("Neutrino energy [GeV]", fontweight="bold")
     ax.set_ylabel(r"$E^2\Phi$ [GeV cm$^{-2}$ s$^{-1}$ sr$^{-1}$]", fontweight="bold")
-    ax.set_title("PUEO ICRC2025 Sensitivity Validation", fontweight="bold")
+    ax.set_title("PUEO Diffuse Neutrino Sensitivity (2025)", fontweight="bold")
     ax.grid(True, which="both", alpha=0.2)
+    ax.text(0.97, 0.03, "All flavors\n90% CL\n30 d", transform=ax.transAxes, ha="right", va="bottom", fontweight="bold")
     ax.legend(frameon=True)
     bold_tick_labels(ax)
     fig.tight_layout()

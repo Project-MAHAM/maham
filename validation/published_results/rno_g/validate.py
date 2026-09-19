@@ -9,7 +9,7 @@ from maham.detector import effective_area_from_effective_volume
 from maham.models import get_model
 from maham.physics.neutrino import interaction_length
 from maham.physics.spectra import centered_log_energy_bounds, convert_spectral_quantity, differential_flux_limit
-from maham.plotting import apply_plot_style, bold_tick_labels
+from maham.plotting import apply_plot_style, bold_tick_labels, validation_curve_style
 
 OUTPUT_DIR = Path(__file__).resolve().parent / "outputs"
 FLUX_UNIT = u.GeV / (u.cm**2 * u.s * u.sr)
@@ -41,12 +41,13 @@ def main():
 
     fig, ax = plt.subplots(figsize=(8, 5))
     x = sensitivity["energy"].to_value(u.GeV)
-    ax.loglog(x, sensitivity["E2phi"].to_value(FLUX_UNIT), color="black", linewidth=2, label="RNO-G Figure 24 nominal approximation")
-    ax.loglog(x, diagnostic.to_value(FLUX_UNIT), color="0.5", linestyle="--", linewidth=1.5, label="Central-Aeff one-decade diagnostic")
+    ax.loglog(x, sensitivity["E2phi"].to_value(FLUX_UNIT), label="Published Figure 24 sensitivity", **validation_curve_style("sensitivity"))
+    ax.loglog(x, diagnostic.to_value(FLUX_UNIT), color="0.55", linestyle=":", linewidth=1.5, label="Central-Aeff one-decade diagnostic")
     ax.set_xlabel("Neutrino energy [GeV]", fontweight="bold")
     ax.set_ylabel(r"$E^2\Phi$ [GeV cm$^{-2}$ s$^{-1}$ sr$^{-1}$]", fontweight="bold")
-    ax.set_title("RNO-G 2021 Sensitivity Validation", fontweight="bold")
+    ax.set_title("RNO-G Diffuse Neutrino Sensitivity (2021)", fontweight="bold")
     ax.grid(True, which="both", alpha=0.2)
+    ax.text(0.97, 0.03, "All flavors\n90% CL\n35 stations, 5 yr", transform=ax.transAxes, ha="right", va="bottom", fontweight="bold")
     ax.legend(frameon=True)
     bold_tick_labels(ax)
     fig.tight_layout()

@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from maham.datasets import get_dataset
-from maham.plotting import apply_plot_style, bold_legend, bold_tick_labels, plot_upper_limits
+from maham.plotting import apply_plot_style, bold_legend, bold_tick_labels, validation_curve_style, plot_upper_limits
 
 
 apply_plot_style()
@@ -211,8 +211,8 @@ def plot_flux_results(limit, sensitivity, glashow):
     ax.set_xlim(2e6, 2e11)
     ax.set_ylim(1e-9, 1.2e-6)
 
-    ax.loglog(limit["energy"].to_value(u.GeV), limit["E2phi"].to_value(E2PHI_UNIT), marker="o", markerfacecolor="white", markeredgewidth=1.5, linewidth=2, markersize=6, label="EHE limit")
-    ax.loglog(sensitivity["energy"].to_value(u.GeV), sensitivity["E2phi"].to_value(E2PHI_UNIT), marker="s", markerfacecolor="white", markeredgewidth=1.5, linestyle="--", linewidth=2, markersize=5.5, label="EHE sensitivity")
+    ax.loglog(limit["energy"].to_value(u.GeV), limit["E2phi"].to_value(E2PHI_UNIT), marker="o", markerfacecolor="white", markeredgecolor="black", markeredgewidth=1.5, markersize=6, label="EHE upper limit", **validation_curve_style("upper_limit"))
+    ax.loglog(sensitivity["energy"].to_value(u.GeV), sensitivity["E2phi"].to_value(E2PHI_UNIT), marker="s", markerfacecolor="white", markeredgecolor="black", markeredgewidth=1.5, markersize=5.5, label="EHE sensitivity", **validation_curve_style("sensitivity"))
 
     energy = glashow["energy"].to_value(u.GeV)
     energy_min = glashow["energy_min"].to_value(u.GeV)
@@ -230,9 +230,9 @@ def plot_flux_results(limit, sensitivity, glashow):
 
     ax.set_xlabel(r"Neutrino energy, $E_{\nu}$ [GeV]")
     ax.set_ylabel(r"Flux, $E^{2}\Phi$ [GeV cm$^{-2}$ s$^{-1}$ sr$^{-1}$]")
-    ax.set_title("IceCube Neutrino Flux Results")
+    ax.set_title("IceCube EHE Upper Limit and Sensitivity (2025)")
     ax.grid(True, which="both", alpha=0.25)
-    ax.text(0.97, 0.02, r"All flavors" "\n" r"$\nu_e:\nu_\mu:\nu_\tau=1:1:1$, $\nu:\bar{\nu}=1:1$", transform=ax.transAxes, ha="right", va="bottom", fontweight="bold")
+    ax.text(0.97, 0.02, r"All flavors" "\n" r"90% CL" "\n" r"$\nu_e:\nu_\mu:\nu_\tau=1:1:1$, $\nu:\bar{\nu}=1:1$", transform=ax.transAxes, ha="right", va="bottom", fontweight="bold")
 
     bold_tick_labels(ax)
     bold_legend(ax.legend(loc="upper right"))
