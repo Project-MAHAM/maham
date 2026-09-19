@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from maham.datasets import get_dataset
-from maham.plotting import apply_plot_style, bold_tick_labels
+from maham.plotting import apply_plot_style, bold_tick_labels, validation_curve_style
 from maham.statistics import feldman_cousins_upper_limit
 
 
@@ -33,11 +33,12 @@ def main():
     print("No flavor, confidence-level, or decade-width conversion is applied")
 
     fig, ax = plt.subplots(figsize=(8, 5))
-    ax.loglog(table["energy"].to_value(u.GeV), table["E2phi"].to_value(UNIT), color="saddlebrown", linestyle="--", linewidth=2.0, marker="o", markerfacecolor="none", label="GRAND200k 10 yr")
+    ax.loglog(table["energy"].to_value(u.GeV), table["E2phi"].to_value(UNIT), label="GRAND200k 10 yr", **validation_curve_style("sensitivity"))
     ax.set_xlabel("Neutrino energy [GeV]", fontweight="bold")
     ax.set_ylabel(r"$E^2\Phi$ [GeV cm$^{-2}$ s$^{-1}$ sr$^{-1}$]", fontweight="bold")
-    ax.set_title("GRAND200k 2021 Sensitivity Validation", fontweight="bold")
+    ax.set_title("GRAND200k Diffuse Neutrino Sensitivity (2021)", fontweight="bold")
     ax.grid(True, which="both", alpha=0.2)
+    ax.text(0.97, 0.03, "All flavors\n90% CL\n10 yr", transform=ax.transAxes, ha="right", va="bottom", fontweight="bold")
     ax.legend(frameon=True)
     bold_tick_labels(ax)
     fig.tight_layout()
