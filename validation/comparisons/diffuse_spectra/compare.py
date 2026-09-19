@@ -428,7 +428,7 @@ def plot_comparison(tables):
     h_glashow = plot_glashow(ax, tables["glashow"], quantity, unit)
     ax.set_xlabel(r"Particle energy, $E$ [GeV]", fontweight="bold")
     ax.set_ylabel(rf"Differential intensity, {quantity_label(quantity)} [{UNIT_LABELS[power]}]", fontweight="bold")
-    ax.set_title("Multimessenger Diffuse Spectra", fontweight="bold")
+    ax.set_title("Multimessenger Diffuse Flux Landscape", fontweight="bold")
     ax.grid(True, which="major", alpha=0.25)
     ax.grid(True, which="minor", alpha=0.15)
     ax.text(0.985, 0.005, NEUTRINO_TEXT, transform=ax.transAxes, ha="right", va="bottom", fontweight="bold", fontsize=LEGEND_FONTSIZE)
