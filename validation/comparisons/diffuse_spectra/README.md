@@ -55,3 +55,10 @@ The GRAND200k curve is the native ten-year all-flavor differential 90% CL sensit
 ### Trinity 2025 projected sensitivity
 
 The Trinity curve is the native ten-year all-flavor differential 90% CL sensitivity from ICRC2025 Figure 2. The source assumes a 20% duty cycle and the full 18-telescope observatory. The Trinity differential-sensitivity construction uses one order of magnitude in energy, so the native normalization is one decade. The 2025 source already labels the displayed curve as a 90% CL upper-limit sensitivity; MAHAM therefore applies no additional SES-to-CL conversion. The source does not explicitly name the confidence-interval construction for this diffuse curve, so no statistical method is inferred. The five plotted vertices were extracted directly from the vector PDF.
+
+### RET-N 2022 projected sensitivity
+
+RET-N is included using the native `RET-N 10 x 100 kW Preliminary` curve from Snowmass Figure 18. The source defines the curve as an all-flavor differential 90% CL sensitivity in decade-wide energy bins with a ten-year integration. The benchmark has ten stations with a 100 kW transmitter per station. Supporting RET ARENA2022 documentation specifies 27 receivers per station, transmitter depth 1.5 km, and an efficient trigger assumption of 0 dB relative to thermal noise over 50 MHz. No flavor, confidence-level, decade-width, or exposure conversion is applied. The source does not name the confidence-interval construction, so MAHAM does not infer one.
+
+Legend ordering intentionally pairs projected technologies with their closest current-limit lineage where possible: RNO-G / ARA, IceCube-Gen2 Radio / IceCube EHE, PUEO / ANITA, and GRAND200k / Auger; Trinity and RET-N follow as additional projected techniques. Projected sensitivities use two legend columns.
+

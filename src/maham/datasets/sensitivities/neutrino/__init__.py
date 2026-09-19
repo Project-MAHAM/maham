@@ -1,8 +1,9 @@
 from maham.datasets.sensitivities.neutrino.icecube_ehe_2025 import IceCubeEHESensitivity2025
 from maham.datasets.sensitivities.neutrino.rno_g_2021 import RNOGDiffuseSensitivity2021
 
-__all__ = ["TrinityDiffuseSensitivity2025", "GRAND200kDiffuseSensitivity2021", "IceCubeGen2RadioDiffuseSensitivity2021", "PUEODiffuseSensitivity2025", "IceCubeEHESensitivity2025", "RNOGDiffuseSensitivity2021"]
+__all__ = ["RETNDiffuseSensitivity2022", "TrinityDiffuseSensitivity2025", "GRAND200kDiffuseSensitivity2021", "IceCubeGen2RadioDiffuseSensitivity2021", "PUEODiffuseSensitivity2025", "IceCubeEHESensitivity2025", "RNOGDiffuseSensitivity2021"]
 from maham.datasets.sensitivities.neutrino.pueo_2025 import PUEODiffuseSensitivity2025
 from maham.datasets.sensitivities.neutrino.icecube_gen2_radio_2021 import IceCubeGen2RadioDiffuseSensitivity2021
 from maham.datasets.sensitivities.neutrino.grand200k_2021 import GRAND200kDiffuseSensitivity2021
 from maham.datasets.sensitivities.neutrino.trinity_2025 import TrinityDiffuseSensitivity2025
+from maham.datasets.sensitivities.neutrino.ret_n_2022 import RETNDiffuseSensitivity2022
